@@ -25,6 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:icon="@drawable/ic_launcher" android:name="StackOpsService"></service>
     </application>
 
 </manifest>

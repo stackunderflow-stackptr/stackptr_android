@@ -17,9 +17,11 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
 import android.widget.EditText;
@@ -44,7 +46,10 @@ public class StackOps extends Activity {
 		passField = (EditText) findViewById(R.id.passField);
 		statusField = (TextView) findViewById(R.id.statusView);
 		
-		settings = getPreferences(MODE_PRIVATE);
+        Context ctx = getApplicationContext();
+        settings = PreferenceManager.getDefaultSharedPreferences(ctx);
+        
+        
 		editor = settings.edit();
 		userField.setText(settings.getString("username", ""));
 		passField.setText(settings.getString("password", ""));
@@ -82,7 +87,8 @@ public class StackOps extends Activity {
 		editor.apply();
 		
 		new LoginTask().execute(username, password);
-		 
+		
+		startService(new Intent(this, StackOpsService.class));
 	}
 
 	private class LoginTask extends AsyncTask<String, String, String> {
