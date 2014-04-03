@@ -11,6 +11,8 @@ import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -24,6 +26,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.Time;
 import android.widget.Toast;
 
 public class StackOpsService extends Service {
@@ -59,7 +62,7 @@ public class StackOpsService extends Service {
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		LocationListener locationListener = new StackLocationListener();
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, locationListener);
-
+		
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
 		String username = settings.getString("username", "");
@@ -67,25 +70,23 @@ public class StackOpsService extends Service {
 
 		new LoginTask().execute(username, password);
 
-
-		mBuilder =
-				new NotificationCompat.Builder(this)
+		mBuilder = new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
 		.setContentTitle("StackOps")
 		.setContentText("Service started.")
 		.setOngoing(true);
-
+		
 		mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
-
+		Notification not = mBuilder.build();
+		mNotifyMgr.notify(mNotificationId, not);
+		
+		startForeground(1,not);
 	}
 
 	@Override
 	public void onDestroy() {
 		Toast.makeText(this, "StackOps service destroyed", Toast.LENGTH_LONG).show();
 		System.out.printf("service destroyed\n");
-
 	}
 
 
@@ -141,8 +142,7 @@ public class StackOpsService extends Service {
 					loggedIn = false;
 					publishProgress("Login failed, check user and password");
 				}
-
-
+			
 			} catch (Exception e) {
 				e.printStackTrace();
 				publishProgress("error fetching form");
@@ -222,14 +222,12 @@ public class StackOpsService extends Service {
 
 		@Override
 		protected void onPostExecute(Location loc) {
-			String notification_text = "Location updated: Lat: " + loc.getLatitude() + " Lng: " + loc.getLongitude();
-
-
+			Time current = new Time(Time.getCurrentTimezone());
+			current.setToNow();
+			String notification_text = "Lat: " + loc.getLatitude() + " Lng: " + loc.getLongitude() + " at: " + current.format("%k:%M:%S");
 			mBuilder.setContentText(notification_text);
 			mNotifyMgr.notify(mNotificationId, mBuilder.build());
-
 			Toast.makeText(getBaseContext(),notification_text, Toast.LENGTH_SHORT).show();
-
 		}
 
 
@@ -244,7 +242,6 @@ public class StackOpsService extends Service {
 		protected void onProgressUpdate(String... text) {
 			//Toast.makeText(getBaseContext(), text.toString(), Toast.LENGTH_SHORT).show(); 
 			System.out.println(text[0]);
-
 		}
 	}
 
@@ -255,28 +252,18 @@ public class StackOpsService extends Service {
 			if (loggedIn) {
 				new UpdateLocationTask().execute(loc);
 			}
-
 		}
 
 		@Override
 		public void onProviderDisabled(String arg0) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void onProviderEnabled(String arg0) {
-			// TODO Auto-generated method stub
-
 		}
 
 		@Override
 		public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-			// TODO Auto-generated method stub
-
-		}
-
-
+		} 
 	}
-
 }

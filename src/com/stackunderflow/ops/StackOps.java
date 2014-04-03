@@ -31,20 +31,14 @@ public class StackOps extends Activity {
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-
 		editor = settings.edit();
 		userField.setText(settings.getString("username", ""));
 		passField.setText(settings.getString("password", ""));
-
-
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		if (settings.contains("username") && settings.contains("password")) {
-			//	doLogin(null);
-		}
 	}
 
 	@Override
@@ -62,7 +56,7 @@ public class StackOps extends Activity {
 		editor.putString("username", username);
 		editor.putString("password", password);
 		editor.apply();
-
+		
 		startService(new Intent(this, StackOpsService.class));
 	}
 
