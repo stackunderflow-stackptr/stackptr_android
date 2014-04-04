@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ public class StackOps extends Activity {
 	EditText userField;
 	EditText passField;
 	TextView statusField;
+	CheckBox debug;
 	SharedPreferences settings;
 	SharedPreferences.Editor editor;
 
@@ -27,6 +29,7 @@ public class StackOps extends Activity {
 		userField = (EditText) findViewById(R.id.userField);
 		passField = (EditText) findViewById(R.id.passField);
 		statusField = (TextView) findViewById(R.id.statusView);
+		debug = (CheckBox) findViewById(R.id.debug);
 
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -34,6 +37,7 @@ public class StackOps extends Activity {
 		editor = settings.edit();
 		userField.setText(settings.getString("username", ""));
 		passField.setText(settings.getString("password", ""));
+		debug.setChecked(settings.getBoolean("debug", true));
 	}
 
 	@Override
@@ -52,9 +56,11 @@ public class StackOps extends Activity {
 
 		String username = userField.getText().toString();
 		String password = passField.getText().toString();
+		Boolean debugEn = debug.isChecked();
 
 		editor.putString("username", username);
 		editor.putString("password", password);
+		editor.putBoolean("debug", debugEn);
 		editor.apply();
 		
 		startService(new Intent(this, StackOpsService.class));

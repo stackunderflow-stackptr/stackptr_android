@@ -53,4 +53,13 @@
         android:onClick="doLogin"
         android:text="Login" />
 
+    <CheckBox
+        android:id="@+id/debug"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/passField"
+        android:layout_below="@+id/passField"
+        android:checked="true"
+        android:text="Annoying Debug Toast" />
+
 </RelativeLayout>

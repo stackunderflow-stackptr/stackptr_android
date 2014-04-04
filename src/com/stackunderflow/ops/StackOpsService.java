@@ -37,10 +37,10 @@ public class StackOpsService extends Service {
 	NotificationCompat.Builder mBuilder;
 	NotificationManager mNotifyMgr;
 	static int mNotificationId = 1;
+	Boolean debug;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -53,7 +53,6 @@ public class StackOpsService extends Service {
 
 	@Override
 	public void onStart(Intent intent, int startId) {
-		// For time consuming an long tasks you can launch a new thread here...
 		Toast.makeText(this, "StackOps service started", Toast.LENGTH_LONG).show();
 		System.out.printf("service started\n");
 
@@ -61,12 +60,13 @@ public class StackOpsService extends Service {
 
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		LocationListener locationListener = new StackLocationListener();
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 1, locationListener);
 		
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
 		String username = settings.getString("username", "");
 		String password = settings.getString("password", "");
+		debug = settings.getBoolean("debug", true);
 
 		new LoginTask().execute(username, password);
 
@@ -152,15 +152,11 @@ public class StackOpsService extends Service {
 
 		@Override
 		protected void onPostExecute(String result) {
-			// execution of result of Long time consuming operation
-			//finalResult.setText(result);
 		}
 
 
 		@Override
 		protected void onPreExecute() {
-			// Things to be done before execution of long running operation. For
-			// example showing ProgessDialog
 		}
 
 
@@ -223,9 +219,17 @@ public class StackOpsService extends Service {
 		@Override
 		protected void onPostExecute(Location loc) {
 			Time current = new Time(Time.getCurrentTimezone());
-			current.setToNow();
-			String notification_text = "Lat: " + loc.getLatitude() + " Lng: " + loc.getLongitude() + " at: " + current.format("%k:%M:%S");
+			current.set(loc.getTime());
+			String notification_text = "Lat: " + loc.getLatitude() + " Lng: " + loc.getLongitude() + " at: " + current.format("%k:%M:%S") + "from: " + loc.getProvider();
 			mBuilder.setContentText(notification_text);
+			
+			NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+			inboxStyle.setBigContentTitle("Details:");
+			inboxStyle.addLine("a");
+			inboxStyle.addLine("b");
+			inboxStyle.addLine("c");
+			inboxStyle.addLine("d");
+			mBuilder.setStyle(inboxStyle);
 			mNotifyMgr.notify(mNotificationId, mBuilder.build());
 			Toast.makeText(getBaseContext(),notification_text, Toast.LENGTH_SHORT).show();
 		}
@@ -233,14 +237,11 @@ public class StackOpsService extends Service {
 
 		@Override
 		protected void onPreExecute() {
-			// Things to be done before execution of long running operation. For
-			// example showing ProgessDialog
 		}
 
 
 		@Override
 		protected void onProgressUpdate(String... text) {
-			//Toast.makeText(getBaseContext(), text.toString(), Toast.LENGTH_SHORT).show(); 
 			System.out.println(text[0]);
 		}
 	}
@@ -251,6 +252,8 @@ public class StackOpsService extends Service {
 		public void onLocationChanged(Location loc) {
 			if (loggedIn) {
 				new UpdateLocationTask().execute(loc);
+			} else {
+				Toast.makeText(getBaseContext(), "Tried to update location but you are not logged in.", Toast.LENGTH_SHORT).show();
 			}
 		}
 
