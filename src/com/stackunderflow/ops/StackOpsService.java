@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
-import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -34,6 +33,7 @@ public class StackOpsService extends Service {
 	SharedPreferences settings;
 	SharedPreferences.Editor editor;
 	Boolean loggedIn;
+	String apikey;
 	NotificationCompat.Builder mBuilder;
 	NotificationManager mNotifyMgr;
 	static int mNotificationId = 1;
@@ -56,7 +56,7 @@ public class StackOpsService extends Service {
 		Toast.makeText(this, "StackOps service started", Toast.LENGTH_LONG).show();
 		System.out.printf("service started\n");
 
-		loggedIn = false;
+		//loggedIn = false;
 
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		LocationListener locationListener = new StackLocationListener();
@@ -64,11 +64,8 @@ public class StackOpsService extends Service {
 		
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
-		String username = settings.getString("username", "");
-		String password = settings.getString("password", "");
+		apikey = settings.getString("apikey", "");
 		debug = settings.getBoolean("debug", true);
-
-		new LoginTask().execute(username, password);
 
 		mBuilder = new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
@@ -90,85 +87,7 @@ public class StackOpsService extends Service {
 	}
 
 
-	private class LoginTask extends AsyncTask<String, String, String> {
-
-		@Override
-		protected String doInBackground(String... params) {
-			publishProgress("Fetching token");
-			String username = params[0];
-			String password = params[1];
-			try {
-				CookieManager cookieManager = new CookieManager();
-				CookieHandler.setDefault(cookieManager);
-
-				// fetch CSRF token
-				URL csrfurl = new URL("https://ops.stackunderflow.com/csrf");
-				HttpURLConnection urlConnection = (HttpURLConnection) csrfurl.openConnection();		  
-				BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-				String token = br.readLine();
-
-				editor = settings.edit();
-				editor.putString("csrftoken", token);
-				editor.apply();
-
-				// now do the login
-				publishProgress("Sending login");
-				URL loginurl = new URL("https://ops.stackunderflow.com/login");
-				HttpURLConnection urlConnection2 = (HttpURLConnection) loginurl.openConnection();
-				urlConnection2.setRequestMethod("POST");
-				urlConnection2.setDoOutput(true);
-				urlConnection2.setDoInput(true);
-				urlConnection2.setRequestProperty("X-CSRFToken", token);
-				urlConnection2.setRequestProperty("Referer", "https://ops.stackunderflow.com/login");
-				urlConnection2.setInstanceFollowRedirects(false);
-				OutputStream os = urlConnection2.getOutputStream();
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
-				writer.write("email="+URLEncoder.encode(username, "UTF-8")+
-						"&password="+URLEncoder.encode(password, "UTF-8")+
-						"&csrf_token="+URLEncoder.encode(token, "UTF-8"));
-				writer.flush();
-				writer.close();
-				int responseCode = urlConnection2.getResponseCode();
-				BufferedReader br2 = new BufferedReader(new InputStreamReader(urlConnection2.getInputStream()));
-				String line;
-				while ((line = br2.readLine()) != null) {
-					System.out.println(line);
-				}
-
-				if (responseCode == 302) {
-					loggedIn = true;
-					publishProgress("Logged in successfully");
-				} else {
-					loggedIn = false;
-					publishProgress("Login failed, check user and password");
-				}
-			
-			} catch (Exception e) {
-				e.printStackTrace();
-				publishProgress("error fetching form");
-			}
-			return "done";
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-		}
-
-
-		@Override
-		protected void onPreExecute() {
-		}
-
-
-		@Override
-		protected void onProgressUpdate(String... text) {
-			Toast.makeText(getBaseContext(), text[0], Toast.LENGTH_SHORT).show();
-			mBuilder.setContentText(text[0]);
-			mNotifyMgr.notify(mNotificationId, mBuilder.build());
-			System.out.println(text[0]);
-		}
-
-	}
+	
 
 	private class UpdateLocationTask extends AsyncTask<Location, String, Location> {
 
@@ -176,6 +95,7 @@ public class StackOpsService extends Service {
 		protected Location doInBackground(Location... params) {
 			Location loc = params[0];
 			try {
+				CookieHandler.setDefault(null);
 				// now do the login
 				publishProgress("updating location");
 				URL updateurl = new URL("https://ops.stackunderflow.com/update");
@@ -183,15 +103,13 @@ public class StackOpsService extends Service {
 				urlConnection2.setRequestMethod("POST");
 				urlConnection2.setDoOutput(true);
 				urlConnection2.setDoInput(true);
-				String token = settings.getString("csrftoken", "");
-				urlConnection2.setRequestProperty("X-CSRFToken", token);
-				urlConnection2.setRequestProperty("Referer", "https://ops.stackunderflow.com/");
+				String apikey = settings.getString("apikey", "");
 				urlConnection2.setInstanceFollowRedirects(false);
 				OutputStream os = urlConnection2.getOutputStream();
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
 				writer.write("lat="+URLEncoder.encode("" + loc.getLatitude(), "UTF-8")+
 						"&lon="+URLEncoder.encode("" + loc.getLongitude(), "UTF-8")+
-						"&csrf_token="+URLEncoder.encode(token, "UTF-8"));
+						"&apikey="+URLEncoder.encode(apikey, "UTF-8"));
 				writer.flush();
 				writer.close();
 				int responseCode = urlConnection2.getResponseCode();
@@ -250,11 +168,11 @@ public class StackOpsService extends Service {
 
 		@Override
 		public void onLocationChanged(Location loc) {
-			if (loggedIn) {
+			//if (loggedIn) {
 				new UpdateLocationTask().execute(loc);
-			} else {
-				Toast.makeText(getBaseContext(), "Tried to update location but you are not logged in.", Toast.LENGTH_SHORT).show();
-			}
+			//} else {
+			//	Toast.makeText(getBaseContext(), "Tried to update location but you are not logged in.", Toast.LENGTH_SHORT).show();
+			//}
 		}
 
 		@Override

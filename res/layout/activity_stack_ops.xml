@@ -21,26 +21,13 @@
         <requestFocus />
     </EditText>
 
-    <EditText
-        android:id="@+id/passField"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/userField"
-        android:layout_below="@+id/userField"
-        android:layout_toLeftOf="@+id/button1"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:textColor="#ffffff" />
-
     <TextView
         android:id="@+id/statusView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_alignLeft="@+id/passField"
         android:layout_alignRight="@+id/button1"
-        android:layout_below="@+id/passField"
-        android:layout_marginTop="23dp"
+        android:layout_below="@+id/debug"
         android:textColor="#CCC" />
 
     <Button
@@ -48,17 +35,52 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/statusView"
+        android:layout_alignBottom="@+id/passField"
         android:layout_alignRight="@+id/userField"
+        android:layout_alignTop="@+id/passField"
         android:onClick="doLogin"
         android:text="Login" />
+
+    <EditText
+        android:id="@+id/passField"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userField"
+        android:layout_toLeftOf="@+id/button1"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textColor="#ffffff" />
+
+    <EditText
+        android:id="@+id/ApiKeyField"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/statusView"
+        android:layout_below="@+id/button1"
+        android:layout_toLeftOf="@+id/button1"
+        android:ems="10"
+        android:hint="API Key"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:id="@+id/Button01"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ApiKeyField"
+        android:layout_alignLeft="@+id/button1"
+        android:layout_alignRight="@+id/statusView"
+        android:layout_alignTop="@+id/ApiKeyField"
+        android:onClick="doStart"
+        android:text="Start" />
 
     <CheckBox
         android:id="@+id/debug"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/passField"
-        android:layout_below="@+id/passField"
+        android:layout_alignLeft="@+id/statusView"
+        android:layout_below="@+id/ApiKeyField"
         android:checked="true"
         android:text="Annoying Debug Toast" />
 
