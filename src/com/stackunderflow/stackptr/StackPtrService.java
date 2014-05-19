@@ -1,4 +1,4 @@
-package com.stackunderflow.ops;
+package com.stackunderflow.stackptr;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,6 +10,8 @@ import java.net.CookieHandler;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+
+import com.stackunderflow.stackptr.R;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -28,7 +30,7 @@ import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.widget.Toast;
 
-public class StackOpsService extends Service {
+public class StackPtrService extends Service {
 
 	SharedPreferences settings;
 	SharedPreferences.Editor editor;
@@ -60,7 +62,7 @@ public class StackOpsService extends Service {
 
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		LocationListener locationListener = new StackLocationListener();
-		locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 1, locationListener);
+		locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 5.0f, locationListener);
 		
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -107,8 +109,12 @@ public class StackOpsService extends Service {
 				urlConnection2.setInstanceFollowRedirects(false);
 				OutputStream os = urlConnection2.getOutputStream();
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
-				writer.write("lat="+URLEncoder.encode("" + loc.getLatitude(), "UTF-8")+
+				writer.write(
+						"lat="+URLEncoder.encode("" + loc.getLatitude(), "UTF-8")+
 						"&lon="+URLEncoder.encode("" + loc.getLongitude(), "UTF-8")+
+						"&alt="+URLEncoder.encode("" + loc.getAltitude(), "UTF-8")+
+						"&hdg="+URLEncoder.encode("" + loc.getBearing(), "UTF-8")+
+						"&spd="+URLEncoder.encode("" + loc.getSpeed(), "UTF-8")+
 						"&apikey="+URLEncoder.encode(apikey, "UTF-8"));
 				writer.flush();
 				writer.close();
@@ -149,7 +155,7 @@ public class StackOpsService extends Service {
 			inboxStyle.addLine("d");
 			mBuilder.setStyle(inboxStyle);
 			mNotifyMgr.notify(mNotificationId, mBuilder.build());
-			Toast.makeText(getBaseContext(),notification_text, Toast.LENGTH_SHORT).show();
+			//Toast.makeText(getBaseContext(),notification_text, Toast.LENGTH_SHORT).show();
 		}
 
 

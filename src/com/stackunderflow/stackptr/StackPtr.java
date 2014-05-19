@@ -1,4 +1,4 @@
-package com.stackunderflow.ops;
+package com.stackunderflow.stackptr;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,6 +10,8 @@ import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+
+import com.stackunderflow.stackptr.R;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,7 +27,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class StackOps extends Activity {
+public class StackPtr extends Activity {
 
 	EditText userField;
 	EditText passField;
@@ -38,7 +40,7 @@ public class StackOps extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_stack_ops);
+		setContentView(R.layout.activity_stack_ptr);
 
 		userField = (EditText) findViewById(R.id.userField);
 		passField = (EditText) findViewById(R.id.passField);
@@ -84,7 +86,13 @@ public class StackOps extends Activity {
 	
 	public void doStart(View view) {
 		// check API key validity
-		startService(new Intent(this, StackOpsService.class));
+		
+		String apikey = apikeyField.getText().toString();
+
+		editor.putString("apikey", apikey);
+		editor.apply();
+		
+		startService(new Intent(this, StackPtrService.class));
 	}
 
 	private class ApiGetTask extends AsyncTask<String, String, String> {
@@ -150,7 +158,7 @@ public class StackOps extends Activity {
 				uc3.setRequestProperty("Referer", "https://ops.stackunderflow.com/api/");
 				OutputStream os2 = uc3.getOutputStream();
 				BufferedWriter w3 = new BufferedWriter(new OutputStreamWriter(os2));
-				String description = "StackOps for Android on " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
+				String description = "StackPtr for Android on " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
 				w3.write("description="+URLEncoder.encode(description, "UTF-8")+"&return=true");
 				w3.flush();
 				w3.close();
