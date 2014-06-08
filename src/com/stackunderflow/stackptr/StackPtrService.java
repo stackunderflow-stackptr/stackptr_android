@@ -48,14 +48,14 @@ public class StackPtrService extends Service {
 
 	@Override
 	public void onCreate() {
-		Toast.makeText(this, "StackOps service launched", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "StackPtr service launched", Toast.LENGTH_LONG).show();
 		System.out.printf("service launched\n");
 
 	}
 
 	@Override
 	public void onStart(Intent intent, int startId) {
-		Toast.makeText(this, "StackOps service started", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "StackPtr service started", Toast.LENGTH_LONG).show();
 		System.out.printf("service started\n");
 
 		//loggedIn = false;
@@ -71,7 +71,7 @@ public class StackPtrService extends Service {
 
 		mBuilder = new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
-		.setContentTitle("StackOps")
+		.setContentTitle("StackPtr")
 		.setContentText("Service started.")
 		.setOngoing(true);
 		
@@ -84,7 +84,7 @@ public class StackPtrService extends Service {
 
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "StackOps service destroyed", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "StackPtr service destroyed", Toast.LENGTH_LONG).show();
 		System.out.printf("service destroyed\n");
 	}
 

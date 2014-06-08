@@ -144,6 +144,7 @@ public class StackPtr extends Activity {
 					publishProgress("Logged in successfully");
 				} else {
 					publishProgress("Login failed, check user and password");
+					return "failed";
 				}
 				
 				// now create the API key
