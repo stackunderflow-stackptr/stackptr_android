@@ -74,7 +74,7 @@ public class StackPtr extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        Toast.makeText(getBaseContext(), "onResume", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getBaseContext(), "onResume", Toast.LENGTH_SHORT).show();
         statusField.setText("Waiting for GPS...\n");
         fglm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         fgll = new StackPtrFGListener();
@@ -86,7 +86,7 @@ public class StackPtr extends Activity {
     public void onPause() {
         super.onPause();
         fglm.removeUpdates(fgll);
-        Toast.makeText(getBaseContext(), "onPause", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getBaseContext(), "onPause", Toast.LENGTH_SHORT).show();
     }
 
 	@Override
@@ -322,7 +322,7 @@ public class StackPtr extends Activity {
 
 		@Override
 		protected void onProgressUpdate(String... text) {
-			Toast.makeText(getBaseContext(), text[0], Toast.LENGTH_SHORT).show();
+			//Toast.makeText(getBaseContext(), text[0], Toast.LENGTH_SHORT).show();
 			System.out.println(text[0]);
 		}
 
@@ -332,7 +332,7 @@ public class StackPtr extends Activity {
 
         @Override
         public void onLocationChanged(Location loc) {
-            Toast.makeText(getBaseContext(), "Loc Updated", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), "Loc Updated", Toast.LENGTH_SHORT).show();
             lastloc = loc;
             new ApiGetUsers().execute();
         }
