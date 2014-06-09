@@ -98,7 +98,19 @@
         android:layout_alignParentEnd="true"
         android:layout_toRightOf="@+id/ApiKeyField"
         android:onClick="doStop"
-        android:layout_above="@+id/statusView"
-        android:textColor="@android:color/background_light" />
+        android:textColor="@android:color/background_light"
+        android:layout_above="@+id/statusView" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Get User List"
+        android:id="@+id/button2"
+        android:layout_alignTop="@+id/button"
+        android:layout_toLeftOf="@+id/button"
+        android:layout_alignBottom="@+id/button"
+        android:textColor="@android:color/background_light"
+        android:onClick="doRefreshUsers" />
 
 </RelativeLayout>

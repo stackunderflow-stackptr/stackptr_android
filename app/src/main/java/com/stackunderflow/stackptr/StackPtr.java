@@ -2,6 +2,7 @@ package com.stackunderflow.stackptr;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -11,8 +12,9 @@ import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import com.stackunderflow.stackptr.R;
-
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -27,6 +29,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class StackPtr extends Activity {
 
 	EditText userField;
@@ -36,6 +41,9 @@ public class StackPtr extends Activity {
 	CheckBox debug;
 	SharedPreferences settings;
 	SharedPreferences.Editor editor;
+    LocationManager fglm;
+    LocationListener fgll;
+    Location lastloc;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +68,26 @@ public class StackPtr extends Activity {
 
 	@Override
 	public void onStart() {
-		super.onStart();
+        super.onStart();
 	}
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Toast.makeText(getBaseContext(), "onResume", Toast.LENGTH_SHORT).show();
+        statusField.setText("Waiting for GPS...\n");
+        fglm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        fgll = new StackPtrFGListener();
+        fglm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, fgll);
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        fglm.removeUpdates(fgll);
+        Toast.makeText(getBaseContext(), "onPause", Toast.LENGTH_SHORT).show();
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -97,6 +123,103 @@ public class StackPtr extends Activity {
 
     public void doStop(View view) {
         stopService(new Intent(this, StackPtrService.class));
+    }
+
+    public void doRefreshUsers(View view) {
+        new ApiGetUsers().execute();
+    }   
+
+    private class ApiGetUsers extends AsyncTask<Void, String, String> {
+        @Override
+        protected String doInBackground(Void... params) {
+            publishProgress("Fetching user list...");
+
+            String apikey = settings.getString("apikey", "");
+
+            if (apikey.equals("")) {
+                return "No API key set.";
+            }
+
+            try {
+                // fetch user list token
+                URL userurl = new URL("https://stackptr.com/users?apikey=" + apikey);
+                HttpsURLConnection userConnection = (HttpsURLConnection) userurl.openConnection();
+                //BufferedReader br = new BufferedReader(new InputStreamReader(userConnection.getInputStream()));
+                //String token = br.readLine();
+
+                int responseCode = userConnection.getResponseCode();
+                if(responseCode != 200) {
+                    publishProgress("Failed to update position: " + responseCode);
+                    return "";
+                }
+
+                InputStream in = userConnection.getInputStream();
+                BufferedReader br2 = new BufferedReader(new InputStreamReader(in));
+
+                // todo: check for request success
+
+                StringBuilder json = new StringBuilder();
+                String line;
+                while ((line = br2.readLine()) != null) {
+                	json.append(line);
+                }
+
+                JSONObject jobj = new JSONObject(json.toString());
+
+                JSONArray following = jobj.getJSONArray("following");
+
+                StringBuilder res = new StringBuilder();
+                for (int i=0; i<following.length(); i++) {
+                    JSONObject thisUser = following.getJSONObject(i);
+                    String user = thisUser.getString("user");
+                    JSONArray loc_s = thisUser.getJSONArray("loc");
+                    double lat = loc_s.getDouble(0);
+                    double lon = loc_s.getDouble(1);
+                    int lastupd = thisUser.getInt("lastupd");
+
+                    Location userLocation = new Location("StackPtr");
+                    userLocation.setLatitude(lat);
+                    userLocation.setLongitude(lon);
+
+                    float dist = lastloc.distanceTo(userLocation);
+                    float bearing = lastloc.bearingTo(userLocation);
+
+                    //String prog = String.format("%s %.2f %.0f %d\n",user,dist,bearing,lastupd);
+                    //String prog = user + " " + dist + "m " + bearing + " deg " + lastupd + "s ago\n";
+
+                    //String prog = "user: " + user + " lat: " + lat + " lon: " + lon + " lastupd " + lastupd + "\n";
+                    String prog = user + " " + StackPtrUtils.distanceFormat(dist)
+                                       + " " + StackPtrUtils.headingFormat(bearing)
+                                       + " " + StackPtrUtils.timeFormat(lastupd) + "\n";
+                    res.append(prog);
+                }
+
+                br2.close();
+                userConnection.disconnect();
+                return res.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Error fetching list.";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            statusField.setText(result + "\n");
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected void onProgressUpdate(String... text) {
+            for (String p: text) {
+                statusField.append(p + "\n");
+            }
+        }
+
     }
 
 	private class ApiGetTask extends AsyncTask<String, String, String> {
@@ -204,6 +327,28 @@ public class StackPtr extends Activity {
 		}
 
 	}
+
+    private class StackPtrFGListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location loc) {
+            Toast.makeText(getBaseContext(), "Loc Updated", Toast.LENGTH_SHORT).show();
+            lastloc = loc;
+            new ApiGetUsers().execute();
+        }
+
+        @Override
+        public void onProviderDisabled(String arg0) {
+        }
+
+        @Override
+        public void onProviderEnabled(String arg0) {
+        }
+
+        @Override
+        public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+        }
+    }
 	
 }
 
