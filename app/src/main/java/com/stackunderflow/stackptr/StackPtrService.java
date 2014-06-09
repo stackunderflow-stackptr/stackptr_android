@@ -1,13 +1,9 @@
 package com.stackunderflow.stackptr;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -30,11 +26,11 @@ import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
 import android.widget.Toast;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class StackPtrService extends Service {
 
 	SharedPreferences settings;
-	SharedPreferences.Editor editor;
-	Boolean loggedIn;
 	String apikey;
 	NotificationCompat.Builder mBuilder;
 	NotificationManager mNotifyMgr;
@@ -48,17 +44,13 @@ public class StackPtrService extends Service {
 
 	@Override
 	public void onCreate() {
-		Toast.makeText(this, "StackPtr service launched", Toast.LENGTH_LONG).show();
-		System.out.printf("service launched\n");
-
+		//Toast.makeText(this, "StackPtr service launched", Toast.LENGTH_LONG).show();
 	}
 
 	@Override
 	public void onStart(Intent intent, int startId) {
 		Toast.makeText(this, "StackPtr service started", Toast.LENGTH_LONG).show();
-		System.out.printf("service started\n");
-
-		//loggedIn = false;
+		//System.out.printf("service started\n");
 
 		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		LocationListener locationListener = new StackLocationListener();
@@ -79,13 +71,13 @@ public class StackPtrService extends Service {
 		Notification not = mBuilder.build();
 		mNotifyMgr.notify(mNotificationId, not);
 		
-		startForeground(1,not);
+		startForeground(mNotificationId,not);
 	}
 
 	@Override
 	public void onDestroy() {
 		Toast.makeText(this, "StackPtr service destroyed", Toast.LENGTH_LONG).show();
-		System.out.printf("service destroyed\n");
+		//System.out.printf("service destroyed\n");
 	}
 
 
@@ -98,44 +90,47 @@ public class StackPtrService extends Service {
 			Location loc = params[0];
 			try {
 				CookieHandler.setDefault(null);
-				// now do the login
 				publishProgress("updating location");
-				URL updateurl = new URL("https://ops.stackunderflow.com/update");
-				HttpURLConnection urlConnection2 = (HttpURLConnection) updateurl.openConnection();
-				urlConnection2.setRequestMethod("POST");
-				urlConnection2.setDoOutput(true);
-				urlConnection2.setDoInput(true);
-				String apikey = settings.getString("apikey", "");
-				urlConnection2.setInstanceFollowRedirects(false);
-				OutputStream os = urlConnection2.getOutputStream();
+				URL updateurl = new URL("https://stackptr.com/update");
+				HttpsURLConnection updateConnection = (HttpsURLConnection) updateurl.openConnection();
+                // ^ closed?
+				updateConnection.setRequestMethod("POST");
+				updateConnection.setDoOutput(true);
+				updateConnection.setDoInput(true);
+                updateConnection.setInstanceFollowRedirects(false);
+
+                String apikey = settings.getString("apikey", "");
+				OutputStream os = updateConnection.getOutputStream();
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
 				writer.write(
-						"lat="+URLEncoder.encode("" + loc.getLatitude(), "UTF-8")+
-						"&lon="+URLEncoder.encode("" + loc.getLongitude(), "UTF-8")+
-						"&alt="+URLEncoder.encode("" + loc.getAltitude(), "UTF-8")+
-						"&hdg="+URLEncoder.encode("" + loc.getBearing(), "UTF-8")+
-						"&spd="+URLEncoder.encode("" + loc.getSpeed(), "UTF-8")+
-						"&apikey="+URLEncoder.encode(apikey, "UTF-8"));
+                        "lat=" + URLEncoder.encode("" + loc.getLatitude(), "UTF-8") +
+                                "&lon=" + URLEncoder.encode("" + loc.getLongitude(), "UTF-8") +
+                                "&alt=" + URLEncoder.encode("" + loc.getAltitude(), "UTF-8") +
+                                "&hdg=" + URLEncoder.encode("" + loc.getBearing(), "UTF-8") +
+                                "&spd=" + URLEncoder.encode("" + loc.getSpeed(), "UTF-8") +
+                                "&apikey=" + URLEncoder.encode(apikey, "UTF-8")
+                );
 				writer.flush();
 				writer.close();
-				int responseCode = urlConnection2.getResponseCode();
-				InputStream in;
-				if(responseCode != 200) {
-					in = urlConnection2.getErrorStream();
-					publishProgress("Failed to update position: " + responseCode);
-				} else {
-					in = urlConnection2.getInputStream();
-					publishProgress("Successfully updated position");
-				}
-				BufferedReader br2 = new BufferedReader(new InputStreamReader(in));
-				String line;
-				while ((line = br2.readLine()) != null) {
-					System.out.println(line);
-				}				  
 
+				int responseCode = updateConnection.getResponseCode();
+				if(responseCode != 200) {
+					publishProgress("Failed to update position: " + responseCode);
+                    return loc;
+				}
+                os.close();
+                updateConnection.disconnect();
+
+                //InputStream in = updateConnection.getInputStream();
+				//publishProgress("Successfully updated position");
+				//BufferedReader br2 = new BufferedReader(new InputStreamReader(in));
+				//String line;
+				//while ((line = br2.readLine()) != null) {
+				//	System.out.println(line);
+				//}
 			} catch (Exception e) {
-				e.printStackTrace();
-				publishProgress("Exception updating pos");
+				//e.printStackTrace();
+				//publishProgress("Exception updating pos");
 			}
 			return loc;
 		}
@@ -144,29 +139,28 @@ public class StackPtrService extends Service {
 		protected void onPostExecute(Location loc) {
 			Time current = new Time(Time.getCurrentTimezone());
 			current.set(loc.getTime());
-			String notification_text = "Lat: " + loc.getLatitude() + " Lng: " + loc.getLongitude() + " at: " + current.format("%k:%M:%S") + "from: " + loc.getProvider();
+			String notification_text = "Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude() + " at: " + current.format("%k:%M:%S") + "from: " + loc.getProvider();
 			mBuilder.setContentText(notification_text);
 			
 			NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 			inboxStyle.setBigContentTitle("Details:");
-			inboxStyle.addLine("a");
-			inboxStyle.addLine("b");
-			inboxStyle.addLine("c");
-			inboxStyle.addLine("d");
+			inboxStyle.addLine("Lat: " + loc.getLatitude());
+            inboxStyle.addLine("Lon: " + loc.getLongitude());
+            inboxStyle.addLine("at: " + current.format("%k:%M:%S"));
+            inboxStyle.addLine("from: " + loc.getProvider());
+
 			mBuilder.setStyle(inboxStyle);
 			mNotifyMgr.notify(mNotificationId, mBuilder.build());
 			//Toast.makeText(getBaseContext(),notification_text, Toast.LENGTH_SHORT).show();
 		}
 
-
 		@Override
 		protected void onPreExecute() {
 		}
 
-
 		@Override
 		protected void onProgressUpdate(String... text) {
-			System.out.println(text[0]);
+            //System.out.println(text[0]);
 		}
 	}
 

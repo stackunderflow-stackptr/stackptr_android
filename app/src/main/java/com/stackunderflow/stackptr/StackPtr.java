@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -95,6 +95,10 @@ public class StackPtr extends Activity {
 		startService(new Intent(this, StackPtrService.class));
 	}
 
+    public void doStop(View view) {
+        stopService(new Intent(this, StackPtrService.class));
+    }
+
 	private class ApiGetTask extends AsyncTask<String, String, String> {
 
 		@Override
@@ -107,24 +111,26 @@ public class StackPtr extends Activity {
 				CookieHandler.setDefault(cookieManager);
 
 				// fetch CSRF token
-				URL csrfurl = new URL("https://ops.stackunderflow.com/csrf");
-				HttpURLConnection urlConnection = (HttpURLConnection) csrfurl.openConnection();		  
-				BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+				URL csrfurl = new URL("https://stackptr.com/csrf");
+				HttpsURLConnection csrfConnection = (HttpsURLConnection) csrfurl.openConnection();
+				BufferedReader br = new BufferedReader(new InputStreamReader(csrfConnection.getInputStream()));
 				String token = br.readLine();
+                br.close();
+                csrfConnection.disconnect();
 
 				editor = settings.edit();
 				editor.putString("csrftoken", token);
 				editor.apply();
 
 				// now do the login
-				publishProgress("Sending login");
-				URL loginurl = new URL("https://ops.stackunderflow.com/login");
-				HttpURLConnection urlConnection2 = (HttpURLConnection) loginurl.openConnection();
+				//publishProgress("Sending login");
+				URL loginurl = new URL("https://stackptr.com/login");
+				HttpsURLConnection urlConnection2 = (HttpsURLConnection) loginurl.openConnection();
 				urlConnection2.setRequestMethod("POST");
 				urlConnection2.setDoOutput(true);
 				urlConnection2.setDoInput(true);
 				urlConnection2.setRequestProperty("X-CSRFToken", token);
-				urlConnection2.setRequestProperty("Referer", "https://ops.stackunderflow.com/login");
+				urlConnection2.setRequestProperty("Referer", "https://stackptr.com/login");
 				urlConnection2.setInstanceFollowRedirects(false);
 				OutputStream os = urlConnection2.getOutputStream();
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
@@ -134,11 +140,11 @@ public class StackPtr extends Activity {
 				writer.flush();
 				writer.close();
 				int responseCode = urlConnection2.getResponseCode();
-				BufferedReader br2 = new BufferedReader(new InputStreamReader(urlConnection2.getInputStream()));
-				String line;
-				while ((line = br2.readLine()) != null) {
-					System.out.println(line);
-				}
+				//BufferedReader br2 = new BufferedReader(new InputStreamReader(urlConnection2.getInputStream()));
+				//String line;
+				//while ((line = br2.readLine()) != null) {
+				//	System.out.println(line);
+				//}
 
 				if (responseCode == 302) {
 					publishProgress("Logged in successfully");
@@ -146,17 +152,18 @@ public class StackPtr extends Activity {
 					publishProgress("Login failed, check user and password");
 					return "failed";
 				}
+                urlConnection2.disconnect();
 				
 				// now create the API key
 				
 				publishProgress("Creating API key");
-				URL apikeyurl = new URL("https://ops.stackunderflow.com/api/new");
-				HttpURLConnection uc3 = (HttpURLConnection) apikeyurl.openConnection();
+				URL apikeyurl = new URL("https://stackptr.com/api/new");
+				HttpsURLConnection uc3 = (HttpsURLConnection) apikeyurl.openConnection();
 				uc3.setRequestMethod("POST");
 				uc3.setDoOutput(true);
 				uc3.setDoInput(true);
 				uc3.setRequestProperty("X-CSRFToken", token);
-				uc3.setRequestProperty("Referer", "https://ops.stackunderflow.com/api/");
+				uc3.setRequestProperty("Referer", "https://stackptr.com/api/");
 				OutputStream os2 = uc3.getOutputStream();
 				BufferedWriter w3 = new BufferedWriter(new OutputStreamWriter(os2));
 				String description = "StackPtr for Android on " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL;
@@ -166,7 +173,9 @@ public class StackPtr extends Activity {
 				int rc = uc3.getResponseCode();
 				BufferedReader br3 = new BufferedReader(new InputStreamReader(uc3.getInputStream()));
 				String key = br3.readLine();
-				editor.putString("apikey", key);
+				br3.close();
+                uc3.disconnect();
+                editor.putString("apikey", key);
 				editor.apply();
 				
 			
