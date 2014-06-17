@@ -11,6 +11,7 @@ import com.stackunderflow.stackptr.R;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -144,12 +145,16 @@ public class StackPtrService extends Service {
 			
 			NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 			inboxStyle.setBigContentTitle("Details:");
-			inboxStyle.addLine("Lat: " + loc.getLatitude());
-            inboxStyle.addLine("Lon: " + loc.getLongitude());
+			inboxStyle.addLine("Loc: " + loc.getLatitude() + " " + loc.getLongitude());
             inboxStyle.addLine("at: " + current.format("%k:%M:%S"));
             inboxStyle.addLine("from: " + loc.getProvider());
 
+            Context ctx = getApplicationContext();
+            Intent appLaunchIntent = new Intent(ctx, StackPtr.class);
+            PendingIntent appLaunchPendingIntent = PendingIntent.getActivity(ctx, 1, appLaunchIntent, Intent.FLAG_ACTIVITY_MULTIPLE_TASK | PendingIntent.FLAG_CANCEL_CURRENT);
+
 			mBuilder.setStyle(inboxStyle);
+            mBuilder.setContentIntent(appLaunchPendingIntent);
 			mNotifyMgr.notify(mNotificationId, mBuilder.build());
 			//Toast.makeText(getBaseContext(),notification_text, Toast.LENGTH_SHORT).show();
 		}

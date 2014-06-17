@@ -4,5 +4,6 @@
     <string name="app_name">StackPtr</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_stack_ptr_login">StackPtrLogin</string>
 
 </resources>

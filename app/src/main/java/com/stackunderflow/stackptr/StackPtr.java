@@ -96,6 +96,11 @@ public class StackPtr extends Activity {
 		return true;
 	}
 
+    public void doTest(View view) {
+        Intent intent = new Intent("com.stackunderflow.stackptr.login");
+        startActivity(intent);
+    }
+    
 	public void doLogin(View view )  {
 
 		String username = userField.getText().toString();
