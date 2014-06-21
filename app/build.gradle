@@ -19,4 +19,6 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:+'
+    compile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
 }

@@ -8,98 +8,49 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin" >
 
-    <EditText
-        android:id="@+id/userField"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="23dp"
-        android:ems="10"
-        android:hint="Username"
-        android:textColor="#ffffff" >
-
-        <requestFocus />
-    </EditText>
 
     <TextView
         android:id="@+id/statusView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_alignLeft="@+id/passField"
-        android:layout_alignRight="@+id/button1"
-        android:layout_below="@+id/debug"
-        android:textColor="#CCC" />
-
-    <Button
-        android:id="@+id/button1"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/passField"
-        android:layout_alignRight="@+id/userField"
-        android:layout_alignTop="@+id/passField"
-        android:onClick="doLogin"
-        android:text="Login"
-        android:textColor="@android:color/background_light" />
-
-    <EditText
-        android:id="@+id/passField"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/userField"
-        android:layout_toLeftOf="@+id/button1"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:textColor="#ffffff" />
-
-    <EditText
-        android:id="@+id/ApiKeyField"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/statusView"
-        android:layout_below="@+id/button1"
-        android:layout_toLeftOf="@+id/button1"
-        android:ems="10"
-        android:hint="API Key"
-        android:textColor="#ffffff" />
+        android:textColor="#CCC"
+        android:layout_below="@+id/Button01"
+        android:layout_above="@+id/button2" />
 
     <Button
         android:id="@+id/Button01"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/ApiKeyField"
-        android:layout_alignLeft="@+id/button1"
-        android:layout_alignRight="@+id/statusView"
-        android:layout_alignTop="@+id/ApiKeyField"
         android:onClick="doStart"
-        android:text="Start"
-        android:textColor="@android:color/background_light" />
+        android:text="Start Service"
+        android:textColor="@android:color/background_light"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@+id/debug" />
 
     <CheckBox
         android:id="@+id/debug"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/statusView"
-        android:layout_below="@+id/ApiKeyField"
         android:checked="true"
         android:text="Debug"
-        android:textColor="@android:color/background_light" />
+        android:textColor="@android:color/background_light"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/button2" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stop"
+        android:text="Stop Service"
         android:id="@+id/button"
-        android:layout_alignTop="@+id/debug"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@+id/ApiKeyField"
         android:onClick="doStop"
         android:textColor="@android:color/background_light"
-        android:layout_above="@+id/statusView" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -107,24 +58,22 @@
         android:layout_height="wrap_content"
         android:text="Get User List"
         android:id="@+id/button2"
-        android:layout_alignTop="@+id/button"
-        android:layout_toLeftOf="@+id/button"
-        android:layout_alignBottom="@+id/button"
         android:textColor="@android:color/background_light"
-        android:onClick="doRefreshUsers" />
+        android:onClick="doRefreshUsers"
+        android:layout_alignBottom="@+id/debug"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="test"
+        android:text="Login Menu"
         android:id="@+id/button3"
-        android:layout_alignBottom="@+id/userField"
-        android:layout_alignRight="@+id/userField"
-        android:layout_alignEnd="@+id/userField"
-        android:layout_alignTop="@+id/userField"
-        android:layout_alignLeft="@+id/button1"
-        android:layout_alignStart="@+id/button1"
-        android:onClick="doTest" />
+        android:onClick="doTest"
+        android:layout_below="@+id/statusView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="#FFF" />
 
 </RelativeLayout>

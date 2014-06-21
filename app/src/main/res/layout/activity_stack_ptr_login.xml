@@ -6,6 +6,60 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.stackunderflow.stackptr.StackPtrLogin">
+    tools:context="com.stackunderflow.stackptr.StackPtrLogin"
+    android:background="@android:color/background_dark">
 
+    <EditText
+        android:id="@+id/userField"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="23dp"
+        android:ems="10"
+        android:hint="Username"
+        android:textColor="#ffffff" >
+
+    <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/passField"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userField"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textColor="#ffffff" />
+
+    <EditText
+        android:id="@+id/ApiKeyField"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="API Key"
+        android:textColor="#ffffff"
+        android:layout_below="@+id/passField"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+
+    <Button
+        android:id="@+id/button1"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/passField"
+        android:layout_alignRight="@+id/userField"
+        android:layout_alignTop="@+id/passField"
+        android:onClick="doLogin"
+        android:text="Login"
+        android:textColor="@android:color/background_light" />
+
+    <TextView
+        android:id="@+id/statusView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:textColor="#CCC"
+        android:layout_below="@+id/ApiKeyField" />
 </RelativeLayout>

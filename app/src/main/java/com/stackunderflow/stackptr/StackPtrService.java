@@ -7,8 +7,6 @@ import java.net.CookieHandler;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import com.stackunderflow.stackptr.R;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,6 +14,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PixelFormat;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,6 +24,11 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -36,7 +40,11 @@ public class StackPtrService extends Service {
 	NotificationCompat.Builder mBuilder;
 	NotificationManager mNotifyMgr;
 	static int mNotificationId = 1;
-	Boolean debug;
+
+    private WindowManager wm;
+    WindowManager.LayoutParams wmp;
+    private ImageView iv;
+
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -45,7 +53,26 @@ public class StackPtrService extends Service {
 
 	@Override
 	public void onCreate() {
+        super.onCreate();
 		//Toast.makeText(this, "StackPtr service launched", Toast.LENGTH_LONG).show();
+        wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        iv = new ImageView(this);
+        iv.setImageResource(R.drawable.ic_launcher);
+
+       wmp = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+
+        wmp.gravity = Gravity.TOP | Gravity.LEFT;
+        wmp.x = 0;
+        wmp.y = 100;
+
+        iv.setOnTouchListener(new StackButtonDragListener());
+        wm.addView(iv, wmp);
+
 	}
 
 	@Override
@@ -60,7 +87,6 @@ public class StackPtrService extends Service {
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
 		apikey = settings.getString("apikey", "");
-		debug = settings.getBoolean("debug", true);
 
 		mBuilder = new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
@@ -77,12 +103,54 @@ public class StackPtrService extends Service {
 
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "StackPtr service destroyed", Toast.LENGTH_LONG).show();
+		super.onDestroy();
+        Toast.makeText(this, "StackPtr service destroyed", Toast.LENGTH_LONG).show();
+
+        if (iv != null) {
+            wm.removeView(iv);
+        }
 		//System.out.printf("service destroyed\n");
 	}
 
 
-	
+	private class StackButtonDragListener implements View.OnTouchListener {
+
+        private int initialX;
+        private int initialY;
+        private float initialTouchX;
+        private float initialTouchY;
+        private boolean hasMoved;
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    initialX = wmp.x;
+                    initialY = wmp.y;
+                    initialTouchX = event.getRawX();
+                    initialTouchY = event.getRawY();
+                    hasMoved = false;
+                    System.out.printf("down\n");
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    if (hasMoved) {
+                        System.out.printf("up, drag\n");
+                    } else {
+                        System.out.printf("clicked\n");
+                    }
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    wmp.x = initialX + (int) (event.getRawX() - initialTouchX);
+                    wmp.y = initialY + (int) (event.getRawY() - initialTouchY);
+                    wm.updateViewLayout(iv, wmp);
+                    hasMoved = true;
+                    System.out.printf("move\n");
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
 
 	private class UpdateLocationTask extends AsyncTask<Location, String, Location> {
 
@@ -122,16 +190,9 @@ public class StackPtrService extends Service {
                 os.close();
                 updateConnection.disconnect();
 
-                //InputStream in = updateConnection.getInputStream();
-				//publishProgress("Successfully updated position");
-				//BufferedReader br2 = new BufferedReader(new InputStreamReader(in));
-				//String line;
-				//while ((line = br2.readLine()) != null) {
-				//	System.out.println(line);
-				//}
 			} catch (Exception e) {
-				//e.printStackTrace();
-				//publishProgress("Exception updating pos");
+				e.printStackTrace();
+				publishProgress("Exception updating position");
 			}
 			return loc;
 		}
@@ -165,7 +226,7 @@ public class StackPtrService extends Service {
 
 		@Override
 		protected void onProgressUpdate(String... text) {
-            //System.out.println(text[0]);
+            System.out.println(text[0]);
 		}
 	}
 
