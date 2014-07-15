@@ -4,8 +4,10 @@ import java.io.BufferedWriter;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.HashMap;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,6 +15,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.location.Location;
@@ -30,8 +33,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.os.BatteryManager;
 
-import javax.net.ssl.HttpsURLConnection;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.OkUrlFactory;
+
+import org.json.JSONObject;
+
 
 public class StackPtrService extends Service {
 
@@ -45,8 +53,12 @@ public class StackPtrService extends Service {
     WindowManager.LayoutParams wmp;
     private ImageView iv;
 
+    OkUrlFactory urlFactory;
 
-	@Override
+    Intent batteryStatus;
+
+
+    @Override
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
@@ -55,6 +67,9 @@ public class StackPtrService extends Service {
 	public void onCreate() {
         super.onCreate();
 		//Toast.makeText(this, "StackPtr service launched", Toast.LENGTH_LONG).show();
+        urlFactory = new OkUrlFactory(new OkHttpClient());
+
+        /*
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         iv = new ImageView(this);
         iv.setImageResource(R.drawable.ic_launcher);
@@ -72,6 +87,7 @@ public class StackPtrService extends Service {
 
         iv.setOnTouchListener(new StackButtonDragListener());
         wm.addView(iv, wmp);
+        */
 
 	}
 
@@ -87,6 +103,9 @@ public class StackPtrService extends Service {
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
 		apikey = settings.getString("apikey", "");
+
+        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        batteryStatus = ctx.registerReceiver(null, ifilter);
 
 		mBuilder = new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
@@ -161,7 +180,8 @@ public class StackPtrService extends Service {
 				CookieHandler.setDefault(null);
 				publishProgress("updating location");
 				URL updateurl = new URL("https://stackptr.com/update");
-				HttpsURLConnection updateConnection = (HttpsURLConnection) updateurl.openConnection();
+				//HttpsURLConnection updateConnection = (HttpsURLConnection) updateurl.openConnection();
+                HttpURLConnection updateConnection = urlFactory.open(updateurl);
                 // ^ closed?
 				updateConnection.setRequestMethod("POST");
 				updateConnection.setDoOutput(true);
@@ -171,14 +191,41 @@ public class StackPtrService extends Service {
                 String apikey = settings.getString("apikey", "");
 				OutputStream os = updateConnection.getOutputStream();
 				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
-				writer.write(
-                        "lat=" + URLEncoder.encode("" + loc.getLatitude(), "UTF-8") +
-                                "&lon=" + URLEncoder.encode("" + loc.getLongitude(), "UTF-8") +
-                                "&alt=" + URLEncoder.encode("" + loc.getAltitude(), "UTF-8") +
-                                "&hdg=" + URLEncoder.encode("" + loc.getBearing(), "UTF-8") +
-                                "&spd=" + URLEncoder.encode("" + loc.getSpeed(), "UTF-8") +
-                                "&apikey=" + URLEncoder.encode(apikey, "UTF-8")
-                );
+
+                StringBuilder update = new StringBuilder();
+                update.append("lat=" + URLEncoder.encode("" + loc.getLatitude(), "UTF-8"));
+                update.append("&lon=" + URLEncoder.encode("" + loc.getLongitude(), "UTF-8"));
+
+                if (loc.hasAltitude()) update.append("&alt=" + URLEncoder.encode("" + loc.getAltitude(), "UTF-8"));
+                if (loc.hasBearing()) update.append("&hdg=" + URLEncoder.encode("" + loc.getBearing(), "UTF-8"));
+                if (loc.hasSpeed()) update.append("&spd=" + URLEncoder.encode("" + loc.getSpeed(), "UTF-8"));
+
+                HashMap<String,String> extra = new HashMap<String,String>();
+
+                int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+
+                extra.put("bat",String.format("%.2f", (float) level / (float) scale));
+
+                switch (status) {
+                    case BatteryManager.BATTERY_STATUS_CHARGING:
+                        extra.put("bst","charge");
+                        break;
+                    case BatteryManager.BATTERY_STATUS_FULL:
+                        extra.put("bst","full");
+                        break;
+                    default:
+                        extra.put("bst","discharge");
+                        break;
+                }
+
+                JSONObject extraJ = new JSONObject(extra);
+                update.append("&ext=" + URLEncoder.encode(extraJ.toString(), "UTF-8"));
+
+                update.append("&apikey=" + URLEncoder.encode(apikey, "UTF-8"));
+
+                writer.write(update.toString());
 				writer.flush();
 				writer.close();
 

@@ -8,15 +8,6 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin" >
 
-
-    <TextView
-        android:id="@+id/statusView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:textColor="#CCC"
-        android:layout_below="@+id/Button01"
-        android:layout_above="@+id/button2" />
-
     <Button
         android:id="@+id/Button01"
         style="?android:attr/buttonStyleSmall"
@@ -25,10 +16,9 @@
         android:onClick="doStart"
         android:text="Start Service"
         android:textColor="@android:color/background_light"
-        android:layout_alignParentTop="true"
+        android:layout_alignBottom="@+id/button"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/debug" />
+        android:layout_alignParentStart="true" />
 
     <CheckBox
         android:id="@+id/debug"
@@ -37,7 +27,7 @@
         android:checked="true"
         android:text="Debug"
         android:textColor="@android:color/background_light"
-        android:layout_alignParentBottom="true"
+        android:layout_alignBottom="@+id/button2"
         android:layout_toRightOf="@+id/button2" />
 
     <Button
@@ -60,7 +50,7 @@
         android:id="@+id/button2"
         android:textColor="@android:color/background_light"
         android:onClick="doRefreshUsers"
-        android:layout_alignBottom="@+id/debug"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -71,9 +61,20 @@
         android:text="Login Menu"
         android:id="@+id/button3"
         android:onClick="doTest"
-        android:layout_below="@+id/statusView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:textColor="#FFF" />
+        android:textColor="#FFF"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/button"
+        android:layout_alignEnd="@+id/button" />
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/listView"
+        android:background="#000"
+        android:layout_below="@+id/Button01"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/button2"
+        style="userview" />
 
 </RelativeLayout>

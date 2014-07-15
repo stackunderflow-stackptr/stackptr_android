@@ -21,7 +21,9 @@ public class StackPtrUtils {
         } else if (time < 3600) {
             return String.format("%dm ago", time / 60);
         } else if (time < 28800) {
-            return String.format("%dh%dm ago", time / 3600, (time % 3600)/60);
+            return String.format("%dh%dm ago", time / 3600, (time % 3600) / 60);
+        } else if (time < 86400) {
+            return String.format("%dh ago", time / 3600);
         } else {
             return String.format("%dd ago", time/86400);
         }

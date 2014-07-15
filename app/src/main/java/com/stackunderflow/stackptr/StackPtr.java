@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import android.location.Location;
 import android.location.LocationListener;
@@ -12,24 +13,30 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.Menu;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class StackPtr extends Activity {
 
-	TextView statusField;
 	CheckBox debug;
 	SharedPreferences settings;
 	SharedPreferences.Editor editor;
@@ -37,12 +44,18 @@ public class StackPtr extends Activity {
     LocationListener fgll;
     Location lastloc;
 
+    UserArrayAdapter adapter;
+    JSONArray jUsers;
+    ArrayList<String> tUsers;
+    JSONObject jMe;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_stack_ptr);
+        tUsers = new ArrayList<String>();
 
-		statusField = (TextView) findViewById(R.id.statusView);
+        setContentView(R.layout.activity_stack_ptr);
+
 		debug = (CheckBox) findViewById(R.id.debug);
 
 		Context ctx = getApplicationContext();
@@ -51,6 +64,33 @@ public class StackPtr extends Activity {
 		editor = settings.edit();
 
 		debug.setChecked(settings.getBoolean("debug", true));
+
+
+        //////////
+        ListView listview = (ListView) findViewById(R.id.listView);
+
+        adapter = new UserArrayAdapter(ctx);
+        listview.setAdapter(adapter);
+
+        /*listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view,
+                                    int position, long id) {
+                final String item = (String) parent.getItemAtPosition(position);
+                view.animate().setDuration(2000).alpha(0)
+                        .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                list.remove(item);
+                                adapter.notifyDataSetChanged();
+                                view.setAlpha(1);
+                            }
+                        }
+                 );
+            }
+
+        });*/
 	}
 
 	@Override
@@ -62,7 +102,7 @@ public class StackPtr extends Activity {
     public void onResume() {
         super.onResume();
         //Toast.makeText(getBaseContext(), "onResume", Toast.LENGTH_SHORT).show();
-        statusField.setText("Waiting for GPS...\n");
+        //statusField.setText("Waiting for GPS...\n");
         fglm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         fgll = new StackPtrFGListener();
         fglm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, fgll);
@@ -107,7 +147,7 @@ public class StackPtr extends Activity {
         @Override
         protected String doInBackground(Void... params) {
 
-            OkUrlFactory ouf = new OkUrlFactory(new OkHttpClient());
+            OkUrlFactory urlFactory = new OkUrlFactory(new OkHttpClient());
 
             publishProgress("Fetching user list...");
 
@@ -120,8 +160,9 @@ public class StackPtr extends Activity {
             try {
                 // fetch user list token
                 URL userurl = new URL("https://stackptr.com/users?apikey=" + apikey);
-                HttpURLConnection userConnection = ouf.open(userurl); //(HttpURLConnection) userurl.openConnection();
-                //BufferedReader br = new BufferedReader(new InputStrea/mReader(userConnection.getInputStream()));
+                HttpURLConnection userConnection = urlFactory.open(userurl);
+                //(HttpURLConnection) userurl.openConnection();
+                //BufferedReader br = new BufferedReader(new InputStreamReader(userConnection.getInputStream()));
                 //String token = br.readLine();
 
                 int responseCode = userConnection.getResponseCode();
@@ -141,15 +182,18 @@ public class StackPtr extends Activity {
                 	json.append(line);
                 }
 
-                JSONObject jobj = new JSONObject(json.toString());
+                JSONObject jObj = new JSONObject(json.toString());
 
-                JSONArray following = jobj.getJSONArray("following");
+                jUsers = jObj.getJSONArray("following");
+                jMe = jObj.getJSONObject("me");
 
-                StringBuilder res = new StringBuilder();
+                //StringBuilder res = new StringBuilder();
+                //tUsers = new ArrayList<String>();
+                tUsers.clear();
 
                 if (lastloc == null) {
-                    JSONObject me = jobj.getJSONObject("me");
-                    JSONArray myloc = me.getJSONArray("loc");
+
+                    JSONArray myloc = jMe.getJSONArray("loc");
 
                     double mylat = myloc.getDouble(0);
                     double mylon = myloc.getDouble(1);
@@ -158,17 +202,18 @@ public class StackPtr extends Activity {
                     lastloc.setLatitude(mylat);
                     lastloc.setLongitude(mylon);
 
-                    res.append("Using last location from web\n");
+                    //res.append("Using last location from web\n");
                     // fixme: this is only printed once
                 }
 
 
 
 
-                for (int i=0; i<following.length(); i++) {
-                    JSONObject thisUser = following.getJSONObject(i);
+                for (int i=0; i<jUsers.length(); i++) {
+                    JSONObject thisUser = jUsers.getJSONObject(i);
                     String user = thisUser.getString("user");
-                    JSONArray loc_s = thisUser.getJSONArray("loc");
+                    tUsers.add(user);
+                    /*JSONArray loc_s = thisUser.getJSONArray("loc");
                     double lat = loc_s.getDouble(0);
                     double lon = loc_s.getDouble(1);
                     int lastupd = thisUser.getInt("lastupd");
@@ -187,12 +232,12 @@ public class StackPtr extends Activity {
                     String prog = user + " " + StackPtrUtils.distanceFormat(dist)
                                        + " " + StackPtrUtils.headingFormat(bearing)
                                        + " " + StackPtrUtils.timeFormat(lastupd) + "\n";
-                    res.append(prog);
+                    res.append(prog);*/
                 }
 
                 br2.close();
                 userConnection.disconnect();
-                return res.toString();
+                return "";//res.toString();
             } catch (Exception e) {
                 e.printStackTrace();
                 return "Error fetching list.";
@@ -201,7 +246,9 @@ public class StackPtr extends Activity {
 
         @Override
         protected void onPostExecute(String result) {
-            statusField.setText(result + "\n");
+            adapter.notifyDataSetChanged();
+            //System.out.printf("notifyDataSetChanged()\n");
+            //statusField.setText(result + "\n");
         }
 
         @Override
@@ -211,13 +258,12 @@ public class StackPtr extends Activity {
 
         @Override
         protected void onProgressUpdate(String... text) {
-            for (String p: text) {
-                statusField.append(p + "\n");
-            }
+            //for (String p: text) {
+            //    statusField.append(p + "\n");
+            //}
         }
 
     }
-
 
     private class StackPtrFGListener implements LocationListener {
 
@@ -240,7 +286,67 @@ public class StackPtr extends Activity {
         public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
         }
     }
-	
+
+
+    private class UserArrayAdapter extends ArrayAdapter<String> {
+        private final Context context;
+
+        public UserArrayAdapter(Context context) {
+            super(context, R.layout.userview, tUsers);
+            this.context = context;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View rowView = inflater.inflate(R.layout.userview, parent, false);
+            TextView firstLine = (TextView) rowView.findViewById(R.id.firstLine);
+            TextView secondLine = (TextView) rowView.findViewById(R.id.secondLine);
+            ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
+
+
+            try {
+                JSONObject jUser = jUsers.getJSONObject(position);
+                String username = jUser.getString("user");
+                firstLine.setText(username);
+
+                JSONArray jLoc = jUser.getJSONArray("loc");
+                double lat = jLoc.getDouble(0);
+                double lon = jLoc.getDouble(1);
+                int lastupd = jUser.getInt("lastupd");
+
+                Location userLocation = new Location("StackPtr");
+                userLocation.setLatitude(lat);
+                userLocation.setLongitude(lon);
+
+                float dist = lastloc.distanceTo(userLocation);
+                float bearing = lastloc.bearingTo(userLocation);
+
+
+                String prog =  StackPtrUtils.distanceFormat(dist)
+                       + " " + StackPtrUtils.headingFormat(bearing)
+                       + " " + StackPtrUtils.timeFormat(lastupd) + "\n";
+
+                secondLine.setText(prog);
+
+                String iconURL = jUser.getString("icon");
+
+                //System.out.println(iconURL);
+                Picasso.with(context).load(iconURL).into(imageView);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            return rowView;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
+    }
+
 }
 
 

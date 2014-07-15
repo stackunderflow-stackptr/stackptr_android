@@ -16,7 +16,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="23dp"
         android:ems="10"
-        android:hint="Username"
+        android:hint="Email"
         android:textColor="#ffffff" >
 
     <requestFocus />
