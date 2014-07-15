@@ -210,15 +210,17 @@ public class StackPtrService extends Service {
 
                 switch (status) {
                     case BatteryManager.BATTERY_STATUS_CHARGING:
-                        extra.put("bst","charge");
+                        extra.put("bst","charging");
                         break;
                     case BatteryManager.BATTERY_STATUS_FULL:
                         extra.put("bst","full");
                         break;
                     default:
-                        extra.put("bst","discharge");
+                        extra.put("bst","discharging");
                         break;
                 }
+
+                extra.put("prov",loc.getProvider());
 
                 JSONObject extraJ = new JSONObject(extra);
                 update.append("&ext=" + URLEncoder.encode(extraJ.toString(), "UTF-8"));
