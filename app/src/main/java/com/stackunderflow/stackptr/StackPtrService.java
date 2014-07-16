@@ -56,6 +56,7 @@ public class StackPtrService extends Service {
     OkUrlFactory urlFactory;
 
     Intent batteryStatus;
+    String versioncode;
 
 
     @Override
@@ -106,6 +107,8 @@ public class StackPtrService extends Service {
 
         IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         batteryStatus = ctx.registerReceiver(null, ifilter);
+
+        versioncode = String.format("%d", BuildConfig.VERSION_CODE);
 
 		mBuilder = new NotificationCompat.Builder(this)
 		.setSmallIcon(R.drawable.ic_launcher)
@@ -221,6 +224,7 @@ public class StackPtrService extends Service {
                 }
 
                 extra.put("prov",loc.getProvider());
+                extra.put("v", versioncode);
 
                 JSONObject extraJ = new JSONObject(extra);
                 update.append("&ext=" + URLEncoder.encode(extraJ.toString(), "UTF-8"));

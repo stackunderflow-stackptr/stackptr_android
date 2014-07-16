@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -31,6 +32,7 @@ public class StackPtrLogin extends Activity {
     EditText passField;
     EditText apikeyField;
     TextView statusField;
+    TextView version;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
 
@@ -42,6 +44,7 @@ public class StackPtrLogin extends Activity {
         userField = (EditText) findViewById(R.id.userField);
         passField = (EditText) findViewById(R.id.passField);
         apikeyField = (EditText) findViewById(R.id.ApiKeyField);
+        version = (TextView) findViewById(R.id.version);
 
         Context ctx = getApplicationContext();
         settings = PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -50,6 +53,8 @@ public class StackPtrLogin extends Activity {
         userField.setText(settings.getString("username", ""));
         passField.setText(settings.getString("password", ""));
         apikeyField.setText(settings.getString("apikey", ""));
+
+        version.setText(String.format("Version %d", BuildConfig.VERSION_CODE));
     }
 
     public void doLogin(View view )  {
