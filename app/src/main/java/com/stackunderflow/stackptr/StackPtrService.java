@@ -55,8 +55,9 @@ public class StackPtrService extends Service {
 
     OkUrlFactory urlFactory;
 
-    Intent batteryStatus;
+    Context ctx;
     String versioncode;
+    IntentFilter ifilter;
 
 
     @Override
@@ -101,13 +102,11 @@ public class StackPtrService extends Service {
 		LocationListener locationListener = new StackLocationListener();
 		locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 5.0f, locationListener);
 		
-		Context ctx = getApplicationContext();
+	    ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
 		apikey = settings.getString("apikey", "");
 
-        IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        batteryStatus = ctx.registerReceiver(null, ifilter);
-
+        ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         versioncode = String.format("%d", BuildConfig.VERSION_CODE);
 
 		mBuilder = new NotificationCompat.Builder(this)
@@ -205,6 +204,7 @@ public class StackPtrService extends Service {
 
                 HashMap<String,String> extra = new HashMap<String,String>();
 
+                Intent batteryStatus = ctx.registerReceiver(null, ifilter);
                 int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
                 int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
                 int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
