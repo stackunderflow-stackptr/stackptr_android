@@ -75,4 +75,18 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:textColor="#FFF" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan QR"
+        android:id="@+id/scanqr"
+        android:layout_alignTop="@+id/ApiKeyField"
+        android:layout_alignRight="@+id/ApiKeyField"
+        android:layout_alignEnd="@+id/ApiKeyField"
+        android:layout_alignBottom="@+id/ApiKeyField"
+        android:onClick="scanQR"
+        android:textColor="@android:color/background_light" />
+
 </RelativeLayout>

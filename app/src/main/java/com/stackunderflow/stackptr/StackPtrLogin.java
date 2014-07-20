@@ -2,6 +2,7 @@ package com.stackunderflow.stackptr;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -12,6 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -67,6 +71,20 @@ public class StackPtrLogin extends Activity {
         editor.apply();
 
         new ApiGetTask().execute(username, password);
+    }
+
+    public void scanQR(View view) {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.initiateScan();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (scanResult != null) {
+            editor.putString("apikey", scanResult.getContents());
+            editor.apply();
+            apikeyField.setText(settings.getString("apikey", ""));
+        }
     }
 
     @Override

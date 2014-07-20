@@ -23,3 +23,6 @@ local.properties
 proguard/
 
 *.keystore
+
+.idea/*
+.DS_Store
