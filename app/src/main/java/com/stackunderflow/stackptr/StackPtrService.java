@@ -103,19 +103,26 @@ public class StackPtrService extends Service {
             Toast.makeText(this, "StackPtr service started", Toast.LENGTH_LONG).show();
             //System.out.printf("service started\n");
 
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            LocationListener locationListener = new StackLocationListener();
-            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 5.0f, locationListener);
-            try {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60 * 5 * 1000, 20.0f, locationListener);
-            } catch (IllegalArgumentException e) {
-                Toast.makeText(this, "NetworkProvider start failed", Toast.LENGTH_LONG).show();
-
-            }
-
             ctx = getApplicationContext();
             settings = PreferenceManager.getDefaultSharedPreferences(ctx);
             apikey = settings.getString("apikey", "");
+
+            // check API key validity here
+
+            int bg_update_time = Integer.parseInt(settings.getString("update_interval", "5"));
+            boolean update_net_in_bg = settings.getBoolean("updates_network_in_bg", true);
+
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            LocationListener locationListener = new StackLocationListener();
+            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 5.0f, locationListener);
+            if (update_net_in_bg) {
+                try {
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60 * bg_update_time * 1000, 20.0f, locationListener);
+                } catch (IllegalArgumentException e) {
+                    Toast.makeText(this, "NetworkProvider start failed", Toast.LENGTH_LONG).show();
+
+                }
+            }
 
             ifilter = new IntentFilter(ACTION_BATTERY_CHANGED);
             versioncode = String.format("%d", BuildConfig.VERSION_CODE);
