@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -55,7 +56,6 @@ public class StackPtrLogin extends Activity {
         editor = settings.edit();
 
         userField.setText(settings.getString("username", ""));
-        passField.setText(settings.getString("password", ""));
         apikeyField.setText(settings.getString("apikey", ""));
 
         version.setText(String.format("Version %d", BuildConfig.VERSION_CODE));
@@ -67,7 +67,6 @@ public class StackPtrLogin extends Activity {
         String password = passField.getText().toString();
 
         editor.putString("username", username);
-        editor.putString("password", password);
         editor.apply();
 
         new ApiGetTask().execute(username, password);
@@ -168,7 +167,7 @@ public class StackPtrLogin extends Activity {
                     publishProgress("Logged in successfully");
                 } else {
                     publishProgress("Login failed, check user and password");
-                    return "failed";
+                    return "Login failed";
                 }
                 urlConnection2.disconnect();
 
@@ -201,11 +200,12 @@ public class StackPtrLogin extends Activity {
                 e.printStackTrace();
                 publishProgress("error fetching form");
             }
-            return "done";
+            return "Logged in successfully.";
         }
 
         @Override
         protected void onPostExecute(String result) {
+            Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
             apikeyField.setText(settings.getString("apikey", ""));
         }
 
