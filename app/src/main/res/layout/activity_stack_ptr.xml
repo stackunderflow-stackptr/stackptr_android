@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:text="Login Menu"
         android:id="@+id/button3"
-        android:onClick="doTest"
+        android:onClick="doShowLogin"
         android:textColor="#FFF"
         android:layout_alignParentBottom="true"
         android:layout_alignRight="@+id/button"

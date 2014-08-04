@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.app.Activity;
 import android.content.Context;
@@ -119,11 +120,11 @@ public class StackPtr extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.stack_ops, menu);
+		getMenuInflater().inflate(R.menu.stackptr_menu, menu);
 		return true;
 	}
 
-    public void doTest(View view) {
+    public void doShowLogin(View view) {
         Intent intent = new Intent("com.stackunderflow.stackptr.login");
         startActivity(intent);
     }
@@ -134,6 +135,19 @@ public class StackPtr extends Activity {
 
 		startService(new Intent(this, StackPtrService.class));
 	}
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent("com.stackunderflow.stackptr.StackPtrSettings");
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     public void doStop(View view) {
         stopService(new Intent(this, StackPtrService.class));
@@ -286,7 +300,6 @@ public class StackPtr extends Activity {
         public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
         }
     }
-
 
     private class UserArrayAdapter extends ArrayAdapter<String> {
         private final Context context;

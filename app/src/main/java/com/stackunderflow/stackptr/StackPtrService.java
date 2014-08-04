@@ -40,6 +40,8 @@ import com.squareup.okhttp.OkUrlFactory;
 
 import org.json.JSONObject;
 
+import static android.content.Intent.*;
+
 
 public class StackPtrService extends Service {
 
@@ -58,6 +60,7 @@ public class StackPtrService extends Service {
     Context ctx;
     String versioncode;
     IntentFilter ifilter;
+    Boolean hasStarted = false;
 
 
     @Override
@@ -94,32 +97,41 @@ public class StackPtrService extends Service {
 	}
 
 	@Override
-	public void onStart(Intent intent, int startId) {
-		Toast.makeText(this, "StackPtr service started", Toast.LENGTH_LONG).show();
-		//System.out.printf("service started\n");
+	public synchronized void onStart(Intent intent, int startId) {
+        if (!hasStarted) {
+            hasStarted = true;
+            Toast.makeText(this, "StackPtr service started", Toast.LENGTH_LONG).show();
+            //System.out.printf("service started\n");
 
-		LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		LocationListener locationListener = new StackLocationListener();
-		locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 5.0f, locationListener);
-		
-	    ctx = getApplicationContext();
-		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
-		apikey = settings.getString("apikey", "");
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            LocationListener locationListener = new StackLocationListener();
+            locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 5.0f, locationListener);
+            try {
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60 * 5 * 1000, 20.0f, locationListener);
+            } catch (IllegalArgumentException e) {
+                Toast.makeText(this, "NetworkProvider start failed", Toast.LENGTH_LONG).show();
 
-        ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        versioncode = String.format("%d", BuildConfig.VERSION_CODE);
+            }
 
-		mBuilder = new NotificationCompat.Builder(this)
-		.setSmallIcon(R.drawable.ic_launcher)
-		.setContentTitle("StackPtr")
-		.setContentText("Service started.")
-		.setOngoing(true);
-		
-		mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		Notification not = mBuilder.build();
-		mNotifyMgr.notify(mNotificationId, not);
-		
-		startForeground(mNotificationId,not);
+            ctx = getApplicationContext();
+            settings = PreferenceManager.getDefaultSharedPreferences(ctx);
+            apikey = settings.getString("apikey", "");
+
+            ifilter = new IntentFilter(ACTION_BATTERY_CHANGED);
+            versioncode = String.format("%d", BuildConfig.VERSION_CODE);
+
+            mBuilder = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setContentTitle("StackPtr")
+                    .setContentText("Service started.")
+                    .setOngoing(true);
+
+            mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            Notification not = mBuilder.build();
+            mNotifyMgr.notify(mNotificationId, not);
+
+            startForeground(mNotificationId, not);
+        }
 	}
 
 	@Override
@@ -265,7 +277,7 @@ public class StackPtrService extends Service {
 
             Context ctx = getApplicationContext();
             Intent appLaunchIntent = new Intent(ctx, StackPtr.class);
-            PendingIntent appLaunchPendingIntent = PendingIntent.getActivity(ctx, 1, appLaunchIntent, Intent.FLAG_ACTIVITY_MULTIPLE_TASK | PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent appLaunchPendingIntent = PendingIntent.getActivity(ctx, 1, appLaunchIntent, PendingIntent.FLAG_CANCEL_CURRENT); // FLAG_ACTIVITY_MULTIPLE_TASK |
 
 			mBuilder.setStyle(inboxStyle);
             mBuilder.setContentIntent(appLaunchPendingIntent);

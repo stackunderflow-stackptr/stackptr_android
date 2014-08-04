@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stackunderflow.stackptr"
-    android:versionCode="12"
-    android:versionName="1.1.3" >
+    android:versionCode="13"
+    android:versionName="1.1.4" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -12,34 +12,57 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
-        android:debuggable="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.stackunderflow.stackptr.StackPtr"
+            android:name=".StackPtr"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.stackunderflow.stackptr.StackPtrLogin"
+            android:name=".StackPtrLogin"
             android:label="StackPtr Login" >
             <intent-filter>
                 <action android:name="com.stackunderflow.stackptr.login" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            </activity>
-        <service
-            android:name="com.stackunderflow.stackptr.StackPtrService"
-            android:icon="@drawable/ic_launcher" />
+        </activity>
 
+        <service
+            android:name=".StackPtrService"
+            android:icon="@drawable/ic_launcher" >
+            <intent-filter>
+                <action android:name="com.stackunderflow.stackptr.StackPtrService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".StackPtrServiceStarter"
+            android:enabled="true"
+            android:exported="true"
+            android:label="StartAtBoot" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".StackPtrSettings"
+            android:label="@string/title_activity_stack_ptr_settings" >
+            <intent-filter>
+                <action android:name="com.stackunderflow.stackptr.StackPtrSettings" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
