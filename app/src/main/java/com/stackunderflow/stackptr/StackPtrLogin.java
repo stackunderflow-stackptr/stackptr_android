@@ -139,8 +139,6 @@ public class StackPtrLogin extends Activity {
                 csrfConnection.disconnect();
 
                 editor = settings.edit();
-                editor.putString("csrftoken", token);
-                editor.apply();
 
                 // now do the login
                 //publishProgress("Sending login");
