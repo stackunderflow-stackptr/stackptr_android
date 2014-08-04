@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -317,15 +318,14 @@ public class StackPtr extends Activity {
             TextView secondLine = (TextView) rowView.findViewById(R.id.secondLine);
             ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
 
-
             try {
                 JSONObject jUser = jUsers.getJSONObject(position);
-                String username = jUser.getString("user");
+                final String username = jUser.getString("user");
                 firstLine.setText(username);
 
                 JSONArray jLoc = jUser.getJSONArray("loc");
-                double lat = jLoc.getDouble(0);
-                double lon = jLoc.getDouble(1);
+                final double lat = jLoc.getDouble(0);
+                final double lon = jLoc.getDouble(1);
                 int lastupd = jUser.getInt("lastupd");
 
                 Location userLocation = new Location("StackPtr");
@@ -346,6 +346,22 @@ public class StackPtr extends Activity {
 
                 //System.out.println(iconURL);
                 Picasso.with(context).load(iconURL).into(imageView);
+
+                rowView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Uri.Builder b = new Uri.Builder();
+                        b.scheme("geo");
+                        b.encodedOpaquePart(lat + "," + lon + "?q=" + lat + "," + lon + "(" + username + ")");
+
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(b.build());
+                        if (i.resolveActivity(getPackageManager()) != null) {
+                            startActivity(i);
+                        }
+                    }
+                });
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
