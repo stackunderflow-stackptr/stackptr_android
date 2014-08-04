@@ -19,10 +19,6 @@ android {
 }
 
 dependencies {
-<<<<<<< Updated upstream
-=======
-    // You must install or update the Support Repository through the SDK manager to use this dependency.
->>>>>>> Stashed changes
     compile 'com.android.support:support-v4:20.0.0'
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
