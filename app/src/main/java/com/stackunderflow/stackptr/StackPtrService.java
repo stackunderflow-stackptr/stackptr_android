@@ -117,7 +117,7 @@ public class StackPtrService extends Service {
             locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, 5000, 5.0f, locationListener);
             if (update_net_in_bg) {
                 try {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60 * bg_update_time * 1000, 20.0f, locationListener);
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60 * bg_update_time * 1000, 0.0f, locationListener);
                 } catch (IllegalArgumentException e) {
                     Toast.makeText(this, "NetworkProvider start failed", Toast.LENGTH_LONG).show();
 
