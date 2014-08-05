@@ -7,6 +7,7 @@ import java.net.CookieHandler;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.NumberFormat;
 import java.util.HashMap;
 
 import android.app.Notification;
@@ -107,9 +108,15 @@ public class StackPtrService extends Service {
             settings = PreferenceManager.getDefaultSharedPreferences(ctx);
             apikey = settings.getString("apikey", "");
 
-            // check API key validity here
+            // check API key "looks" valid here i.e. right length and is at least set
 
-            int bg_update_time = Integer.parseInt(settings.getString("update_interval", "5"));
+            int bg_update_time;
+            try {
+                bg_update_time = Integer.parseInt(settings.getString("update_interval", "5"));
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid value for update_interval", Toast.LENGTH_LONG).show();
+                bg_update_time = 5;
+            }
             boolean update_net_in_bg = settings.getBoolean("updates_network_in_bg", true);
 
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
