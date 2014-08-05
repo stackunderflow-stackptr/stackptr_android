@@ -9,15 +9,30 @@
     tools:context="com.stackunderflow.stackptr.StackPtrLogin"
     android:background="@android:color/background_dark">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/heading_create_key"
+        android:id="@+id/lblLoginHeader"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/btnLogin"
+        android:layout_alignEnd="@+id/btnLogin"
+        android:singleLine="true" />
+
     <EditText
         android:id="@+id/userField"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="23dp"
         android:ems="10"
         android:hint="Email"
-        android:textColor="#ffffff" >
+        android:textColor="#ffffff"
+        android:layout_alignParentTop="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="false"
+        android:layout_below="@+id/lblLoginHeader"
+        android:inputType="textEmailAddress">
 
     <requestFocus />
     </EditText>
@@ -30,7 +45,32 @@
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword"
-        android:textColor="#ffffff" />
+        android:textColor="#ffffff"
+        android:layout_alignParentRight="true" />
+
+
+    <Button
+        android:id="@+id/btnLogin"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="doLogin"
+        android:text="@string/btn_login"
+        android:textColor="@android:color/background_light"
+        android:layout_below="@+id/passField"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/heading_use_existing_key"
+        android:id="@+id/lblApiKey"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btnLogin" />
 
     <EditText
         android:id="@+id/ApiKeyField"
@@ -39,29 +79,18 @@
         android:ems="10"
         android:hint="API Key"
         android:textColor="#ffffff"
-        android:layout_below="@+id/passField"
+        android:layout_below="@+id/lblApiKey"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-
-    <Button
-        android:id="@+id/button1"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/passField"
-        android:layout_alignRight="@+id/userField"
-        android:layout_alignTop="@+id/passField"
-        android:onClick="doLogin"
-        android:text="Login"
-        android:textColor="@android:color/background_light" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:inputType="textNoSuggestions" />
 
     <TextView
         android:id="@+id/statusView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:textColor="#CCC"
-        android:layout_below="@+id/ApiKeyField" />
+        android:layout_below="@+id/btnScanQR" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -76,17 +105,18 @@
         android:layout_alignParentEnd="true"
         android:textColor="#FFF" />
 
-    <Button
+    <ImageButton
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan QR"
-        android:id="@+id/scanqr"
-        android:layout_alignTop="@+id/ApiKeyField"
-        android:layout_alignRight="@+id/ApiKeyField"
+        android:text="Scan API key from QR"
+        android:id="@+id/btnScanQR"
         android:layout_alignEnd="@+id/ApiKeyField"
-        android:layout_alignBottom="@+id/ApiKeyField"
         android:onClick="scanQR"
-        android:textColor="@android:color/background_light" />
+        android:textColor="@android:color/background_light"
+        android:layout_below="@+id/ApiKeyField"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:src="@android:drawable/ic_menu_camera" />
 
 </RelativeLayout>

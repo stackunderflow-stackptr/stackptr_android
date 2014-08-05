@@ -8,73 +8,70 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin" >
 
-    <Button
-        android:id="@+id/Button01"
+    <ImageButton
+        android:id="@+id/btnStartService"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="doStart"
-        android:text="Start Service"
+        android:text="Start service"
         android:textColor="@android:color/background_light"
-        android:layout_alignBottom="@+id/button"
+        android:layout_alignBottom="@+id/btnStopService"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:singleLine="true"
+        android:src="@android:drawable/ic_media_play"
+        android:contentDescription="@string/start_service"
+        android:scaleType="center" />
+
+    <ImageButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop service"
+        android:id="@+id/btnStopService"
+        android:onClick="doStop"
+        android:textColor="@android:color/background_light"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:contentDescription="@string/stop_service" />
+
+    <ImageButton
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Refresh user list"
+        android:id="@+id/btnGetUserList"
+        android:textColor="@android:color/background_light"
+        android:onClick="doRefreshUsers"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:contentDescription="@string/refresh_user_list"
+        android:src="@android:drawable/stat_notify_sync" />
 
     <CheckBox
         android:id="@+id/debug"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="true"
-        android:text="Debug"
+        android:text="@string/debug"
         android:textColor="@android:color/background_light"
-        android:layout_alignBottom="@+id/button2"
-        android:layout_toRightOf="@+id/button2" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop Service"
-        android:id="@+id/button"
-        android:onClick="doStop"
-        android:textColor="@android:color/background_light"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Get User List"
-        android:id="@+id/button2"
-        android:textColor="@android:color/background_light"
-        android:onClick="doRefreshUsers"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Login Menu"
-        android:id="@+id/button3"
-        android:onClick="doShowLogin"
-        android:textColor="#FFF"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/button"
-        android:layout_alignEnd="@+id/button" />
+        android:layout_alignBottom="@+id/btnGetUserList"
+        android:layout_alignTop="@+id/btnGetUserList"
+        android:layout_alignParentRight="true" />
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
         android:background="#000"
-        android:layout_below="@+id/Button01"
+        android:layout_below="@+id/btnStartService"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/button2"
+        android:layout_above="@+id/btnGetUserList"
         style="userview" />
 
 </RelativeLayout>
