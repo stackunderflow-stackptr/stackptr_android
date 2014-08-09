@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="action_settings">Einstellungen</string>
-    <string name="title_activity_stack_ptr_login">StackPtrAnmelden</string>
+    <string name="title_activity_stack_ptr_login">StackPtr-Anmelden</string>
     <string name="heading_use_existing_key">Verwenden Sie eine vorhandene Zugangsschlüssel</string>
     <string name="heading_create_key">Erstellen Sie einen neuen Zugangsschlüssel</string>
     <string name="btn_login">Anmelden</string>
