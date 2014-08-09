@@ -3,7 +3,7 @@
 
     <string name="app_name">StackPtr</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_stack_ptr_login">StackPtrLogin</string>
+    <string name="title_activity_stack_ptr_login">StackPtr Login</string>
     <string name="heading_use_existing_key">Use existing access key</string>
     <string name="heading_create_key">Create a new access key</string>
     <string name="btn_login">Login</string>
