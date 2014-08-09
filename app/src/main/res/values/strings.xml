@@ -10,6 +10,7 @@
     <string name="refresh_user_list">Refresh user list</string>
     <string name="start_service">Start service</string>
     <string name="stop_service">Stop service</string>
+    <string name="btn_scan_qr">Scan QR code</string>
 
     <string name="compass_short_N">N</string>
     <string name="compass_short_NE">NE</string>

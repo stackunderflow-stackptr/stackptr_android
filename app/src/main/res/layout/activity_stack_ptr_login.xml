@@ -90,7 +90,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:textColor="#CCC"
-        android:layout_below="@+id/btnScanQR" />
+        android:layout_below="@+id/btnScanQR"
+
+        />
 
     <TextView
         android:layout_width="wrap_content"
@@ -109,7 +111,6 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan API key from QR"
         android:id="@+id/btnScanQR"
         android:layout_alignEnd="@+id/ApiKeyField"
         android:onClick="scanQR"
@@ -117,6 +118,8 @@
         android:layout_below="@+id/ApiKeyField"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:src="@android:drawable/ic_menu_camera" />
+        android:src="@android:drawable/ic_menu_camera"
+        android:contentDescription="@string/btn_scan_qr"
+        />
 
 </RelativeLayout>
