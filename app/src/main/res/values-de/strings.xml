@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Einstellungen</string>
+    <string name="title_activity_stack_ptr_login">StackPtrAnmelden</string>
+    <string name="heading_use_existing_key">Verwenden Sie eine vorhandene Zugangsschlüssel</string>
+    <string name="heading_create_key">Erstellen Sie einen neuen Zugangsschlüssel</string>
+    <string name="btn_login">Anmelden</string>
+    <string name="refresh_user_list">Update Benutzerliste</string>
+    <string name="start_service">Starten</string>
+    <string name="stop_service">Abbrechen</string>
+
+    <string name="compass_short_N">N</string>
+    <string name="compass_short_NE">NO</string>
+    <string name="compass_short_E">O</string>
+    <string name="compass_short_SE">SO</string>
+    <string name="compass_short_S">S</string>
+    <string name="compass_short_SW">SW</string>
+    <string name="compass_short_W">W</string>
+    <string name="compass_short_NW">NW</string>
+
+    <string name="compass_long_N">Nord</string>
+    <string name="compass_long_NE">Nordost</string>
+    <string name="compass_long_E">Ost</string>
+    <string name="compass_long_SE">Südost</string>
+    <string name="compass_long_S">Süd</string>
+    <string name="compass_long_SW">Südwest</string>
+    <string name="compass_long_W">West</string>
+    <string name="compass_long_NW">Nordwest</string>
+
+    <string name="no_update">kein update</string>
+
+    <plurals name="seconds_ago_short">
+        <item quantity="one">vor %ds</item>
+        <item quantity="other">vor %ds</item>
+    </plurals>
+
+    <plurals name="minutes_ago_short">
+        <item quantity="one">vor %dm</item>
+        <item quantity="other">vor %dm</item>
+    </plurals>
+
+    <plurals name="hours_ago_short">
+        <item quantity="one">vor %dm</item>
+        <item quantity="other">vor %dh</item>
+    </plurals>
+
+    <plurals name="days_ago_short">
+        <item quantity="one">vor %dd</item>
+        <item quantity="other">vor %dd</item>
+    </plurals>
+
+    <plurals name="seconds_ago_long">
+        <item quantity="one">vor eine Sekunde</item>
+        <item quantity="other">vor %d Sekunden</item>
+    </plurals>
+
+    <plurals name="minutes_ago_long">
+        <item quantity="one">vor eine Minute</item>
+        <item quantity="other">vor %d Minuten</item>
+    </plurals>
+
+    <plurals name="hours_ago_long">
+        <item quantity="one">vor eine Stunde</item>
+        <item quantity="other">vor %d Stunden</item>
+    </plurals>
+
+    <plurals name="days_ago_long">
+        <item quantity="one">vor ein Tag</item>
+        <item quantity="other">vor %d Tage</item>
+    </plurals>
+
+
+</resources>

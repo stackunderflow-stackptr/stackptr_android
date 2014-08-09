@@ -3,7 +3,6 @@
 
     <string name="app_name">StackPtr</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_stack_ptr_login">StackPtrLogin</string>
     <string name="heading_use_existing_key">Use existing access key</string>
     <string name="heading_create_key">Create a new access key</string>
@@ -11,9 +10,6 @@
     <string name="refresh_user_list">Refresh user list</string>
     <string name="start_service">Start service</string>
     <string name="stop_service">Stop service</string>
-    <string name="debug">Debug</string>
-
-
 
     <string name="compass_short_N">N</string>
     <string name="compass_short_NE">NE</string>
@@ -52,22 +48,22 @@
     </plurals>
 
     <plurals name="seconds_ago_long">
-        <item quantity="one">%d second ago</item>
+        <item quantity="one">a second ago</item>
         <item quantity="other">%d seconds ago</item>
     </plurals>
 
     <plurals name="minutes_ago_long">
-        <item quantity="one">%d minute ago</item>
+        <item quantity="one">a minute ago</item>
         <item quantity="other">%d minutes ago</item>
     </plurals>
 
     <plurals name="hours_ago_long">
-        <item quantity="one">%d hour ago</item>
+        <item quantity="one">an hour ago</item>
         <item quantity="other">%d hours ago</item>
     </plurals>
 
     <plurals name="days_ago_long">
-        <item quantity="one">%d day ago</item>
+        <item quantity="one">a day ago</item>
         <item quantity="other">%d days ago</item>
     </plurals>
     
