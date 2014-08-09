@@ -8,70 +8,17 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin" >
 
-    <ImageButton
-        android:id="@+id/btnStartService"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="doStart"
-        android:text="Start service"
-        android:textColor="@android:color/background_light"
-        android:layout_alignBottom="@+id/btnStopService"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:singleLine="true"
-        android:src="@android:drawable/ic_media_play"
-        android:contentDescription="@string/start_service"
-        android:scaleType="center" />
-
-    <ImageButton
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stop service"
-        android:id="@+id/btnStopService"
-        android:onClick="doStop"
-        android:textColor="@android:color/background_light"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
-        android:contentDescription="@string/stop_service" />
-
-    <ImageButton
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Refresh user list"
-        android:id="@+id/btnGetUserList"
-        android:textColor="@android:color/background_light"
-        android:onClick="doRefreshUsers"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:contentDescription="@string/refresh_user_list"
-        android:src="@android:drawable/stat_notify_sync" />
-
-    <CheckBox
-        android:id="@+id/debug"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:checked="true"
-        android:text="@string/debug"
-        android:textColor="@android:color/background_light"
-        android:layout_alignBottom="@+id/btnGetUserList"
-        android:layout_alignTop="@+id/btnGetUserList"
-        android:layout_alignParentRight="true" />
-
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
         android:background="#000"
-        android:layout_below="@+id/btnStartService"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/btnGetUserList"
-        style="userview" />
+        style="userview"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>

@@ -58,14 +58,10 @@ public class StackPtr extends Activity {
 
         setContentView(R.layout.activity_stack_ptr);
 
-		debug = (CheckBox) findViewById(R.id.debug);
-
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
 
 		editor = settings.edit();
-
-		debug.setChecked(settings.getBoolean("debug", true));
 
 
         //////////
@@ -125,19 +121,6 @@ public class StackPtr extends Activity {
 		return true;
 	}
 
-    public void doShowLogin(View view) {
-        Intent intent = new Intent("com.stackunderflow.stackptr.login");
-        startActivity(intent);
-    }
-    
-
-	public void doStart(View view) {
-		// check API key validity
-
-		startService(new Intent(this, StackPtrService.class));
-	}
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -145,18 +128,22 @@ public class StackPtr extends Activity {
                 Intent intent = new Intent("com.stackunderflow.stackptr.StackPtrSettings");
                 startActivity(intent);
                 return true;
+            case R.id.action_refresh_userlist:
+                new ApiGetUsers().execute();
+                return true;
+            case R.id.action_start_service:
+                // TODO: Check API key validity
+                startService(new Intent(this, StackPtrService.class));
+                return true;
+            case R.id.action_stop_service:
+                stopService(new Intent(this, StackPtrService.class));
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void doStop(View view) {
-        stopService(new Intent(this, StackPtrService.class));
-    }
-
-    public void doRefreshUsers(View view) {
-        new ApiGetUsers().execute();
-    }   
 
     private class ApiGetUsers extends AsyncTask<Void, String, String> {
         @Override
@@ -337,10 +324,15 @@ public class StackPtr extends Activity {
 
 
                 String prog =  StackPtrUtils.distanceFormat(dist)
-                       + " " + StackPtrUtils.headingFormat(bearing)
-                       + " " + StackPtrUtils.timeFormat(lastupd) + "\n";
+                       + " " + StackPtrUtils.getShortCompassName(bearing, context)
+                       + " " + StackPtrUtils.timeFormat(lastupd, false, context) + "\n";
+
+                String longProg = StackPtrUtils.distanceFormat(dist)
+                        + " " + StackPtrUtils.getLongCompassName(bearing, context)
+                        + " " + StackPtrUtils.timeFormat(lastupd, true, context) + "\n";
 
                 secondLine.setText(prog);
+                secondLine.setContentDescription(longProg);
 
                 String iconURL = jUser.getString("icon");
 

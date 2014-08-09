@@ -1,4 +1,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/action_refresh_userlist"
+        android:title="@string/refresh_user_list"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/stat_notify_sync"
+        />
+
+    <item android:id="@+id/action_start_service"
+        android:title="@string/start_service"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_media_play"
+        />
+    <item android:id="@+id/action_stop_service"
+        android:title="@string/stop_service"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        />
 
     <item
         android:id="@+id/action_settings"

@@ -1,60 +1,89 @@
 package com.stackunderflow.stackptr;
 
+import android.content.Context;
+import android.content.res.Resources;
+
 /**
  * Created by gm on 9/06/2014.
  * Based on stackops-utils.js
  */
 public class StackPtrUtils {
     public static String distanceFormat(double distance) {
-        if (distance > 1000) {
+        if (distance > 100000) {
+            return String.format("%.0f km", distance/1000);
+        } else if (distance > 1000) {
             return String.format("%.2f km", distance/1000);
         } else {
             return String.format("%.0f m", distance);
         }
     }
 
-    public static String timeFormat(long time) {
+    public static String timeFormat(long time, boolean long_form, Context ctx) {
         time = (System.currentTimeMillis() / (long)1000) - time;
+        Resources res = ctx.getResources();
         if (time == -1) {
-            return "no upd";
+            return res.getString(R.string.no_update);
         } else if (time < 60) {
-            return String.format("%ds ago", time);
+            return res.getQuantityString(long_form ?
+                    R.plurals.seconds_ago_long : R.plurals.seconds_ago_short, (int) time, time);
         } else if (time < 3600) {
-            return String.format("%dm ago", time / 60);
+            long v = time / 60;
+            return res.getQuantityString(long_form ?
+                    R.plurals.minutes_ago_long : R.plurals.minutes_ago_short, (int) v, v);
         } else if (time < 86400) {
-            return String.format("%dh%dm ago", time / 3600, (time % 3600) / 60);
+            long v = time / 3600;
+            return res.getQuantityString(long_form ?
+                    R.plurals.hours_ago_long : R.plurals.hours_ago_short, (int)v, v);
         } else {
-            return String.format("%dd ago", time/86400);
+            long v = time / 86400;
+            return res.getQuantityString(long_form ?
+                    R.plurals.days_ago_long : R.plurals.days_ago_short, (int)v, v);
         }
     }
 
-    public static String headingFormat(double heading) {
-        if (heading < 0) {
-            heading = 360 + heading;
-        }
-
-        return String.format("%.0f %s",heading,compassBox(heading));
-    }
-
-    public static String compassBox(double heading) {
+    public static String getShortCompassName(double heading, Context ctx) {
         if (heading < 22.5) {
-            return "N";
+            return ctx.getString(R.string.compass_short_N);
         } else if (heading < 67.5) {
-            return "NE";
+            return ctx.getString(R.string.compass_short_NE);
         } else if (heading < 112.5) {
-            return "E";
+            return ctx.getString(R.string.compass_short_E);
         } else if (heading < 157.5) {
-            return "SE";
+            return ctx.getString(R.string.compass_short_SE);
         } else if (heading < 202.5) {
-            return "S";
+            return ctx.getString(R.string.compass_short_S);
         } else if (heading < 247.5) {
-            return "SW";
+            return ctx.getString(R.string.compass_short_SW);
         } else if (heading < 292.5) {
-            return "W";
+            return ctx.getString(R.string.compass_short_W);
         } else if (heading < 337.5) {
-            return "NW";
+            return ctx.getString(R.string.compass_short_NW);
         } else {
-            return "N";
+            return ctx.getString(R.string.compass_short_N);
         }
     }
+
+    public static String getLongCompassName(double heading, Context ctx) {
+        if (heading < 22.5) {
+            return ctx.getString(R.string.compass_long_N);
+        } else if (heading < 67.5) {
+            return ctx.getString(R.string.compass_long_NE);
+        } else if (heading < 112.5) {
+            return ctx.getString(R.string.compass_long_E);
+        } else if (heading < 157.5) {
+            return ctx.getString(R.string.compass_long_SE);
+        } else if (heading < 202.5) {
+            return ctx.getString(R.string.compass_long_S);
+        } else if (heading < 247.5) {
+            return ctx.getString(R.string.compass_long_SW);
+        } else if (heading < 292.5) {
+            return ctx.getString(R.string.compass_long_W);
+        } else if (heading < 337.5) {
+            return ctx.getString(R.string.compass_long_NW);
+        } else {
+            return ctx.getString(R.string.compass_long_N);
+        }
+    }
+
+    
 }

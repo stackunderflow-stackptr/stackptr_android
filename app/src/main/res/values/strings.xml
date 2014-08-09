@@ -13,4 +13,62 @@
     <string name="stop_service">Stop service</string>
     <string name="debug">Debug</string>
 
+
+
+    <string name="compass_short_N">N</string>
+    <string name="compass_short_NE">NE</string>
+    <string name="compass_short_E">E</string>
+    <string name="compass_short_SE">SE</string>
+    <string name="compass_short_S">S</string>
+    <string name="compass_short_SW">SW</string>
+    <string name="compass_short_W">W</string>
+    <string name="compass_short_NW">NW</string>
+
+    <string name="compass_long_N">North</string>
+    <string name="compass_long_NE">North East</string>
+    <string name="compass_long_E">East</string>
+    <string name="compass_long_SE">South East</string>
+    <string name="compass_long_S">South</string>
+    <string name="compass_long_SW">South West</string>
+    <string name="compass_long_W">West</string>
+    <string name="compass_long_NW">North West</string>
+
+    <string name="no_update">no update</string>
+
+    <plurals name="seconds_ago_short">
+        <item quantity="other">%ds ago</item>
+    </plurals>
+
+    <plurals name="minutes_ago_short">
+        <item quantity="other">%dm ago</item>
+    </plurals>
+    
+    <plurals name="hours_ago_short">
+        <item quantity="other">%dh ago</item>
+    </plurals>
+    
+    <plurals name="days_ago_short">
+        <item quantity="other">%dd ago</item>
+    </plurals>
+
+    <plurals name="seconds_ago_long">
+        <item quantity="one">%d second ago</item>
+        <item quantity="other">%d seconds ago</item>
+    </plurals>
+
+    <plurals name="minutes_ago_long">
+        <item quantity="one">%d minute ago</item>
+        <item quantity="other">%d minutes ago</item>
+    </plurals>
+
+    <plurals name="hours_ago_long">
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+
+    <plurals name="days_ago_long">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+    
 </resources>
