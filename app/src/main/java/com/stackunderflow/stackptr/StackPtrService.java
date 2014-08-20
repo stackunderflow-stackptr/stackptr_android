@@ -207,7 +207,7 @@ public class StackPtrService extends Service {
 			try {
 				CookieHandler.setDefault(null);
 				publishProgress("updating location");
-				URL updateurl = new URL("https://stackptr.com/update");
+                URL updateurl = new URL(settings.getString("server_address", "https://stackptr.com") + "/update");
 				//HttpsURLConnection updateConnection = (HttpsURLConnection) updateurl.openConnection();
                 HttpURLConnection updateConnection = urlFactory.open(updateurl);
                 // ^ closed?

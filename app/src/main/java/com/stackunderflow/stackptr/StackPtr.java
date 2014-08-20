@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import android.location.Location;
@@ -154,6 +155,7 @@ public class StackPtr extends Activity {
             publishProgress("Fetching user list...");
 
             String apikey = settings.getString("apikey", "");
+            String serverHost = settings.getString("server_address", "https://stackptr.com");
 
             if (apikey.equals("")) {
                 return "No API key set.";
@@ -161,7 +163,8 @@ public class StackPtr extends Activity {
 
             try {
                 // fetch user list token
-                URL userurl = new URL("https://stackptr.com/users?apikey=" + apikey);
+
+                URL userurl = new URL(serverHost + "/users?apikey=" + apikey);
                 HttpURLConnection userConnection = urlFactory.open(userurl);
                 //(HttpURLConnection) userurl.openConnection();
                 //BufferedReader br = new BufferedReader(new InputStreamReader(userConnection.getInputStream()));

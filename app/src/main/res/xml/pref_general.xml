@@ -5,4 +5,11 @@
     <Preference android:title="@string/pref_login">
         <intent android:action="com.stackunderflow.stackptr.login" />
     </Preference>
+
+    <EditTextPreference android:title="@string/title_server_address"
+        android:key="server_address"
+        android:text="@string/text_server_address"
+        android:defaultValue="https://stackptr.com"
+        />
+
 </PreferenceScreen>

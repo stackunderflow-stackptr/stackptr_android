@@ -11,6 +11,8 @@
     <string name="start_service">Start service</string>
     <string name="stop_service">Stop service</string>
     <string name="btn_scan_qr">Scan QR code</string>
+    <string name="title_server_address">Server address</string>
+    <string name="text_server_address">URI to where the StackPtr service is running.</string>
 
     <string name="compass_short_N">N</string>
     <string name="compass_short_NE">NE</string>
