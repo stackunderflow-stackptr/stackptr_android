@@ -24,7 +24,6 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 
 import com.squareup.okhttp.OkHttpClient;
@@ -153,15 +152,15 @@ public class StackPtrLogin extends Activity {
 
                 // TODO: fix properly so that this doesn't follow redirect
                 if (responseCode == 302 || responseCode == 200) {
-                    publishProgress("Logged in successfully, fetching API key");
+                    publishProgress(getString(R.string.login_success));
                 } else {
-                    publishProgress("Login failed, check user and password");
+                    publishProgress(getString(R.string.login_fail));
                     return "Login failed";
                 }
 
                 // now create the API key
 
-                publishProgress("Creating API key");
+                publishProgress(getString(R.string.creating_api_key));
                 URL apikeyurl = new URL(serverHost + "/api/new");
                 HttpURLConnection uc3 = urlFactory.open(apikeyurl);
                 uc3.setRequestMethod("POST");
@@ -183,12 +182,12 @@ public class StackPtrLogin extends Activity {
                 editor.putString("apikey", key);
                 editor.apply();
 
-                publishProgress("Created new API key.");
+                publishProgress(getString(R.string.created_api_key));
 
 
             } catch (Exception e) {
                 e.printStackTrace();
-                publishProgress("error fetching form");
+                publishProgress(getString(R.string.error_login_form));
             }
             return "Logged in successfully.";
         }

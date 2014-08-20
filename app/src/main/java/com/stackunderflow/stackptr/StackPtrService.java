@@ -101,7 +101,7 @@ public class StackPtrService extends Service {
 	public synchronized void onStart(Intent intent, int startId) {
         if (!hasStarted) {
             hasStarted = true;
-            Toast.makeText(this, "StackPtr service started", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.service_started), Toast.LENGTH_LONG).show();
             //System.out.printf("service started\n");
 
             ctx = getApplicationContext();
@@ -114,7 +114,7 @@ public class StackPtrService extends Service {
             try {
                 bg_update_time = Integer.parseInt(settings.getString("update_interval", "5"));
             } catch (NumberFormatException e) {
-                Toast.makeText(this, "Invalid value for update_interval", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(R.string.invalid_update_interval), Toast.LENGTH_LONG).show();
                 bg_update_time = 5;
             }
             boolean update_net_in_bg = settings.getBoolean("updates_network_in_bg", true);
@@ -126,7 +126,7 @@ public class StackPtrService extends Service {
                 try {
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60 * bg_update_time * 1000, 0.0f, locationListener);
                 } catch (IllegalArgumentException e) {
-                    Toast.makeText(this, "NetworkProvider start failed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.networkprovider_fail), Toast.LENGTH_LONG).show();
 
                 }
             }
@@ -136,8 +136,8 @@ public class StackPtrService extends Service {
 
             mBuilder = new NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.ic_launcher)
-                    .setContentTitle("StackPtr")
-                    .setContentText("Service started.")
+                    .setContentTitle(getString(R.string.app_name))
+                    .setContentText(getString(R.string.service_started))
                     .setOngoing(true);
 
             mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -151,7 +151,7 @@ public class StackPtrService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-        Toast.makeText(this, "StackPtr service destroyed", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.service_destroyed), Toast.LENGTH_LONG).show();
 
         if (iv != null) {
             wm.removeView(iv);
@@ -206,7 +206,7 @@ public class StackPtrService extends Service {
 			Location loc = params[0];
 			try {
 				CookieHandler.setDefault(null);
-				publishProgress("updating location");
+				publishProgress("Updating location");
                 URL updateurl = new URL(settings.getString("server_address", "https://stackptr.com") + "/update");
 				//HttpsURLConnection updateConnection = (HttpsURLConnection) updateurl.openConnection();
                 HttpURLConnection updateConnection = urlFactory.open(updateurl);

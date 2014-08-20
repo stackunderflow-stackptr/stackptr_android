@@ -33,6 +33,15 @@
     <string name="compass_long_NW">North West</string>
 
     <string name="no_update">no update</string>
+    <string name="service_started">Service started</string>
+    <string name="service_destroyed">StackPtr service destroyed</string>
+    <string name="networkprovider_fail">NetworkProvider start failed</string>
+    <string name="invalid_update_interval">Invalid value for update_interval</string>
+    <string name="login_success">Logged in successfully, fetching API key</string>
+    <string name="login_fail">Login failed, check user and password</string>
+    <string name="creating_api_key">Creating API key</string>
+    <string name="created_api_key">Created new API key</string>
+    <string name="error_login_form">Error fetching login form</string>
 
     <plurals name="seconds_ago_short">
         <item quantity="other">%ds ago</item>
