@@ -224,11 +224,28 @@ public class StackPtrService extends Service {
                 update.append("lat=" + URLEncoder.encode("" + loc.getLatitude(), "UTF-8"));
                 update.append("&lon=" + URLEncoder.encode("" + loc.getLongitude(), "UTF-8"));
 
-                if (loc.hasAltitude()) update.append("&alt=" + URLEncoder.encode("" + loc.getAltitude(), "UTF-8"));
-                if (loc.hasBearing()) update.append("&hdg=" + URLEncoder.encode("" + loc.getBearing(), "UTF-8"));
-                if (loc.hasSpeed()) update.append("&spd=" + URLEncoder.encode("" + loc.getSpeed(), "UTF-8"));
+                if (loc.hasAltitude()) {
+                    // Send altitude to 1 metre accuracy
+                    update.append(String.format("&alt=%.0f", loc.getAltitude()));
+                }
+
+                if (loc.hasBearing()) {
+                    // Send bearing to 1 degree accuracy
+                    update.append(String.format("&hdg=%.0f", loc.getBearing()));
+                }
+
+                if (loc.hasSpeed()) {
+                    // Send speed to 0.01m/s accuracy (about 0.036km/h)
+                    update.append(String.format("&spd=%.2f", loc.getSpeed()));
+                }
 
                 HashMap<String,String> extra = new HashMap<String,String>();
+
+                if (loc.hasAccuracy()) {
+                    // Android defines this as the area that it is 68% confident the device is
+                    // within.  We send this to an accuracy of 1 metre.
+                    extra.put("acc", String.format("%.0f", loc.getAccuracy()));
+                }
 
                 Intent batteryStatus = ctx.registerReceiver(null, ifilter);
                 int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
