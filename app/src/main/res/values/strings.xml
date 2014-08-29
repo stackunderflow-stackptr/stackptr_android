@@ -42,6 +42,7 @@
     <string name="creating_api_key">Creating API key</string>
     <string name="created_api_key">Created new API key</string>
     <string name="error_login_form">Error fetching login form</string>
+    <string name="my_location_is_unknown">My location is unknown to the server.</string>
 
     <plurals name="seconds_ago_short">
         <item quantity="other">%ds ago</item>

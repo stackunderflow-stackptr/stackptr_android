@@ -64,6 +64,7 @@ public class StackPtr extends Activity {
 		editor = settings.edit();
 
 
+
         //////////
         ListView listview = (ListView) findViewById(R.id.listView);
 
@@ -148,6 +149,22 @@ public class StackPtr extends Activity {
     private class ApiGetUsers extends AsyncTask<Void, String, String> {
         @Override
         protected String doInBackground(Void... params) {
+            /*
+            ///// DEBUG DEBUG DEBUG
+            Location l1 = new Location("StackTest");
+            l1.setLatitude(35);
+            l1.setLongitude(-140);
+            Location l2 = new Location("StackTest");
+            l2.setLatitude(-35);
+            l2.setLongitude(140);
+
+            System.out.println("l1->l2 bearing: " + l1.bearingTo(l2));     // -124.18
+            System.out.println("l1->l2 distance: " + l1.distanceTo(l2));   // 1.13E7
+
+            System.out.println("l2->l1 bearing: " + l2.bearingTo(l1));     // 55.81
+            System.out.println("l2->l1 distance: " + l2.distanceTo(l1));   // 1.13E7
+            ///// DEBUG DEBUG DEBUG
+            */
 
             OkUrlFactory urlFactory = new OkUrlFactory(new OkHttpClient());
 
@@ -189,6 +206,11 @@ public class StackPtr extends Activity {
                 JSONObject jObj = new JSONObject(json.toString());
 
                 jUsers = jObj.getJSONArray("following");
+
+                if (jObj.isNull("me")) {
+                    publishProgress(getString(R.string.my_location_is_unknown));
+                    return "My location is unknown to server";
+                }
                 jMe = jObj.getJSONObject("me");
 
                 //StringBuilder res = new StringBuilder();

@@ -42,6 +42,10 @@ public class StackPtrUtils {
     }
 
     public static String getShortCompassName(double heading, Context ctx) {
+        // Sometimes we get back a -180 .. 180 value if it's a big distance?
+        // TODO: Check the documentation to see if this is mentioned.
+        heading %= 360;
+
         if (heading < 22.5) {
             return ctx.getString(R.string.compass_short_N);
         } else if (heading < 67.5) {
