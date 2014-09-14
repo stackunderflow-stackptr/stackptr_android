@@ -13,7 +13,6 @@
     <string name="btn_scan_qr">Scan QR code</string>
     <string name="title_server_address">Server address</string>
     <string name="text_server_address">URI to where the StackPtr service is running.</string>
-
     <string name="compass_short_N">N</string>
     <string name="compass_short_NE">NE</string>
     <string name="compass_short_E">E</string>
@@ -22,7 +21,6 @@
     <string name="compass_short_SW">SW</string>
     <string name="compass_short_W">W</string>
     <string name="compass_short_NW">NW</string>
-
     <string name="compass_long_N">North</string>
     <string name="compass_long_NE">North East</string>
     <string name="compass_long_E">East</string>
@@ -31,7 +29,6 @@
     <string name="compass_long_SW">South West</string>
     <string name="compass_long_W">West</string>
     <string name="compass_long_NW">North West</string>
-
     <string name="no_update">no update</string>
     <string name="service_started">Service started</string>
     <string name="service_destroyed">StackPtr service destroyed</string>
@@ -47,37 +44,33 @@
     <plurals name="seconds_ago_short">
         <item quantity="other">%ds ago</item>
     </plurals>
-
     <plurals name="minutes_ago_short">
         <item quantity="other">%dm ago</item>
     </plurals>
-    
     <plurals name="hours_ago_short">
         <item quantity="other">%dh ago</item>
     </plurals>
-    
     <plurals name="days_ago_short">
         <item quantity="other">%dd ago</item>
     </plurals>
-
     <plurals name="seconds_ago_long">
         <item quantity="one">a second ago</item>
         <item quantity="other">%d seconds ago</item>
     </plurals>
-
     <plurals name="minutes_ago_long">
         <item quantity="one">a minute ago</item>
         <item quantity="other">%d minutes ago</item>
     </plurals>
-
     <plurals name="hours_ago_long">
         <item quantity="one">an hour ago</item>
         <item quantity="other">%d hours ago</item>
     </plurals>
-
     <plurals name="days_ago_long">
         <item quantity="one">a day ago</item>
         <item quantity="other">%d days ago</item>
     </plurals>
-    
+
+    <string name="title_activity_stack_ptr_map">StackPtrMap</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>

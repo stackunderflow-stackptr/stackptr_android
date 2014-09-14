@@ -24,7 +24,9 @@ import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -328,6 +330,7 @@ public class StackPtr extends Activity {
             TextView firstLine = (TextView) rowView.findViewById(R.id.firstLine);
             TextView secondLine = (TextView) rowView.findViewById(R.id.secondLine);
             ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
+            ImageButton mapButton = (ImageButton) rowView.findViewById(R.id.mapButton);
 
             try {
                 JSONObject jUser = jUsers.getJSONObject(position);
@@ -375,6 +378,14 @@ public class StackPtr extends Activity {
                         if (i.resolveActivity(getPackageManager()) != null) {
                             startActivity(i);
                         }
+                    }
+                });
+
+                mapButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent("com.stackunderflow.stackptr.StackPtrMap");
+                        startActivity(intent);
                     }
                 });
 

@@ -43,4 +43,16 @@
         android:textSize="16sp"
         android:textColor="#FFF" />
 
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mapButton"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:src="@android:drawable/ic_menu_mapmode"
+        style="?android:attr/borderlessButtonStyle"
+        />
+
+
 </RelativeLayout>

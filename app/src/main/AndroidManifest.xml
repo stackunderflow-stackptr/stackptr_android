@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stackunderflow.stackptr"
-    android:versionCode="14"
-    android:versionName="1.1.5" >
+    android:versionCode="15"
+    android:versionName="1.1.6" >
 
     <uses-sdk
         android:minSdkVersion="16"
@@ -33,6 +33,7 @@
             android:label="StackPtr Login" >
             <intent-filter>
                 <action android:name="com.stackunderflow.stackptr.login" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -60,9 +61,20 @@
             android:label="@string/title_activity_stack_ptr_settings" >
             <intent-filter>
                 <action android:name="com.stackunderflow.stackptr.StackPtrSettings" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".StackPtrMap"
+            android:label="StackPtrMap" >
+            <intent-filter>
+                <action android:name="com.stackunderflow.stackptr.StackPtrMap" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
