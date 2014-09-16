@@ -159,14 +159,25 @@ public class StackPtr extends Activity {
             Location l2 = new Location("StackTest");
             l2.setLatitude(-35);
             l2.setLongitude(140);
+            Location l3 = new Location("StackTest");
+            l3.setLatitude(-32);
+            l3.setLongitude(143);
+
 
             System.out.println("l1->l2 bearing: " + l1.bearingTo(l2));     // -124.18
             System.out.println("l1->l2 distance: " + l1.distanceTo(l2));   // 1.13E7
 
             System.out.println("l2->l1 bearing: " + l2.bearingTo(l1));     // 55.81
             System.out.println("l2->l1 distance: " + l2.distanceTo(l1));   // 1.13E7
+
+
+            System.out.println("l2->l3 bearing: " + l2.bearingTo(l3));     //
+            System.out.println("l2->l3 distance: " + l2.distanceTo(l3));   //
+
+            System.out.println("l1->l3 bearing: " + l1.bearingTo(l3));     //
+            System.out.println("l1->l3 distance: " + l1.distanceTo(l3));   //
             ///// DEBUG DEBUG DEBUG
-            */
+            // */
 
             OkUrlFactory urlFactory = new OkUrlFactory(new OkHttpClient());
 

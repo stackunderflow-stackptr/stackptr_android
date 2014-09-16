@@ -69,8 +69,9 @@ public class StackPtrUtils {
      */
     public static String getShortCompassName(double heading, Context ctx) {
         // Sometimes we get back a -180 .. 180 value if it's a big distance?
-        // TODO: Check the documentation to see if this is mentioned. (a.l.Location.bearingTo)
-        heading %= 360;
+        if (heading < 0) {
+            heading += 360;
+        }
 
         if (heading < 22.5) {
             return ctx.getString(R.string.compass_short_N);
@@ -103,8 +104,9 @@ public class StackPtrUtils {
      */
     public static String getLongCompassName(double heading, Context ctx) {
         // Sometimes we get back a -180 .. 180 value if it's a big distance?
-        // TODO: Check the documentation to see if this is mentioned. (a.l.Location.bearingTo)
-        heading %= 360;
+        if (heading < 0) {
+            heading += 360;
+        }
 
         if (heading < 22.5) {
             return ctx.getString(R.string.compass_long_N);
