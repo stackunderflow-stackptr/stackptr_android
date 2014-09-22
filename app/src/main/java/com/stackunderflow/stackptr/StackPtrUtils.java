@@ -1,6 +1,8 @@
 package com.stackunderflow.stackptr;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 
 /**
@@ -129,5 +131,24 @@ public class StackPtrUtils {
         }
     }
 
+    /**
+     * Shows an alert dialog box.  Does not block.
+     *
+     * @param ctx The context to run the dialog in, normally your Activity.
+     * @param title The title text for the alert dialog.
+     * @param message The message for the alert dialog.
+     */
+    public static void showAlertDialog(Context ctx, String title, String message) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(ctx);
+        dlgAlert.setTitle(title);
+        dlgAlert.setMessage(message);
+        dlgAlert.setCancelable(true);
+        dlgAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.dismiss();
+            }
+        });
+        dlgAlert.show();
+    }
     
 }

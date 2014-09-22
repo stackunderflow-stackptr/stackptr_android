@@ -70,7 +70,8 @@ public class StackPtr extends Activity {
         //////////
         ListView listview = (ListView) findViewById(R.id.listView);
 
-        adapter = new UserArrayAdapter(ctx);
+        // requires context of the current Activity
+        adapter = new UserArrayAdapter(this);
         listview.setAdapter(adapter);
 
         /*listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -171,11 +172,11 @@ public class StackPtr extends Activity {
             System.out.println("l2->l1 distance: " + l2.distanceTo(l1));   // 1.13E7
 
 
-            System.out.println("l2->l3 bearing: " + l2.bearingTo(l3));     //
-            System.out.println("l2->l3 distance: " + l2.distanceTo(l3));   //
+            System.out.println("l2->l3 bearing: " + l2.bearingTo(l3));     // 40.79
+            System.out.println("l2->l3 distance: " + l2.distanceTo(l3));   // 434028.9
 
-            System.out.println("l1->l3 bearing: " + l1.bearingTo(l3));     //
-            System.out.println("l1->l3 distance: " + l1.distanceTo(l3));   //
+            System.out.println("l1->l3 bearing: " + l1.bearingTo(l3));     // -123.16089
+            System.out.println("l1->l3 distance: " + l1.distanceTo(l3));   // 1.09E7
             ///// DEBUG DEBUG DEBUG
             // */
 
@@ -388,6 +389,9 @@ public class StackPtr extends Activity {
                         i.setData(b.build());
                         if (i.resolveActivity(getPackageManager()) != null) {
                             startActivity(i);
+                        } else {
+                            // Mainly a concern for the emulator and non-GApps devices
+                            StackPtrUtils.showAlertDialog(context, getString(R.string.no_map_title), getString(R.string.no_map_message));
                         }
                     }
                 });

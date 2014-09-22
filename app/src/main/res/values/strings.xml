@@ -73,4 +73,7 @@
     <string name="title_activity_stack_ptr_map">StackPtrMap</string>
     <string name="hello_world">Hello world!</string>
 
+    <string name="no_map_title">No mapping application installed</string>
+    <string name="no_map_message">Please install a mapping application in order to view this location.</string>
+
 </resources>

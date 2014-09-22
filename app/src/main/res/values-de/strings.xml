@@ -70,4 +70,8 @@
     </plurals>
 
 
+    <string name="no_map_title">Kein Kartenprogramm</string>
+    <!-- FIXME: this is a bit short -->
+    <string name="no_map_message">Installieren Sie ein Kartenprogramm.</string>
+
 </resources>
