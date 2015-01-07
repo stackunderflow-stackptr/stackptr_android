@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import android.location.Location;
 import android.location.LocationListener;
@@ -49,14 +50,14 @@ public class StackPtr extends Activity {
     Location lastloc;
 
     UserArrayAdapter adapter;
-    JSONArray jUsers;
-    ArrayList<String> tUsers;
+    JSONObject jUsers;
+    ArrayList<Integer> tUsers;
     JSONObject jMe;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        tUsers = new ArrayList<String>();
+        tUsers = new ArrayList<Integer>();
 
         setContentView(R.layout.activity_stack_ptr);
 
@@ -217,15 +218,39 @@ public class StackPtr extends Activity {
                 	json.append(line);
                 }
 
-                JSONObject jObj = new JSONObject(json.toString());
+                JSONArray jObj = new JSONArray(json.toString());
 
-                jUsers = jObj.getJSONArray("following");
+                jUsers = null;
+                jMe = null;
 
-                if (jObj.isNull("me")) {
-                    publishProgress(getString(R.string.my_location_is_unknown));
-                    return "My location is unknown to server";
+                for (int i=0; i<jObj.length(); i++) {
+                    JSONObject msg = jObj.getJSONObject(i);
+                    String name = msg.getString("type");
+                    if (name.equals("user")) {
+                        jUsers = msg.getJSONObject("data");
+                    } else if (name.equals("user-me")) {
+                        jMe = msg.getJSONObject("data");
+                    }
                 }
-                jMe = jObj.getJSONObject("me");
+
+                if (jUsers == null) {
+                    return "no data";
+                }
+
+                if (jMe == null) {
+                    return "no data";
+                }
+
+
+                //return "";
+
+                //jUsers = jObj.getJSONArray("following");
+
+                //if (jObj.isNull("me")) {
+                    //publishProgress(getString(R.string.my_location_is_unknown));
+                //    return "My location is unknown to server";
+                //}
+                //jMe = jObj.getJSONObject("me");
 
                 //StringBuilder res = new StringBuilder();
                 //tUsers = new ArrayList<String>();
@@ -249,9 +274,10 @@ public class StackPtr extends Activity {
 
 
 
-                for (int i=0; i<jUsers.length(); i++) {
-                    JSONObject thisUser = jUsers.getJSONObject(i);
-                    String user = thisUser.getString("user");
+                Iterator<String> userIterator = jUsers.keys();
+                while (userIterator.hasNext()) {
+                    JSONObject thisUser = jUsers.getJSONObject(userIterator.next());
+                    Integer user = thisUser.getInt("id");
                     tUsers.add(user);
                     /*JSONArray loc_s = thisUser.getJSONArray("loc");
                     double lat = loc_s.getDouble(0);
@@ -298,6 +324,7 @@ public class StackPtr extends Activity {
 
         @Override
         protected void onProgressUpdate(String... text) {
+            System.out.printf("%s\n", (Object) text);
             //for (String p: text) {
             //    statusField.append(p + "\n");
             //}
@@ -327,7 +354,7 @@ public class StackPtr extends Activity {
         }
     }
 
-    private class UserArrayAdapter extends ArrayAdapter<String> {
+    private class UserArrayAdapter extends ArrayAdapter<Integer> {
         private final Context context;
 
         public UserArrayAdapter(Context context) {
@@ -342,11 +369,11 @@ public class StackPtr extends Activity {
             TextView firstLine = (TextView) rowView.findViewById(R.id.firstLine);
             TextView secondLine = (TextView) rowView.findViewById(R.id.secondLine);
             ImageView imageView = (ImageView) rowView.findViewById(R.id.icon);
-            ImageButton mapButton = (ImageButton) rowView.findViewById(R.id.mapButton);
+            //ImageButton mapButton = (ImageButton) rowView.findViewById(R.id.mapButton);
 
             try {
-                JSONObject jUser = jUsers.getJSONObject(position);
-                final String username = jUser.getString("user");
+                JSONObject jUser = jUsers.getJSONObject(Integer.toString(tUsers.get(position))); // FIXME
+                final String username = jUser.getString("username");
                 firstLine.setText(username);
 
                 JSONArray jLoc = jUser.getJSONArray("loc");
@@ -396,13 +423,14 @@ public class StackPtr extends Activity {
                     }
                 });
 
+                /*
                 mapButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent("com.stackunderflow.stackptr.StackPtrMap");
                         startActivity(intent);
                     }
-                });
+                });*/
 
 
             } catch (JSONException e) {
