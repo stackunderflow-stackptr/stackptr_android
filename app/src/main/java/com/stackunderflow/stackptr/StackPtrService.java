@@ -14,6 +14,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -62,6 +63,7 @@ public class StackPtrService extends Service {
     String versioncode;
     IntentFilter ifilter;
     Boolean hasStarted = false;
+    Boolean overlayShown = false;
 
 
     @Override
@@ -75,7 +77,7 @@ public class StackPtrService extends Service {
 		//Toast.makeText(this, "StackPtr service launched", Toast.LENGTH_LONG).show();
         urlFactory = new OkUrlFactory(new OkHttpClient());
 
-        /*
+
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         iv = new ImageView(this);
         iv.setImageResource(R.drawable.ic_launcher);
@@ -92,8 +94,7 @@ public class StackPtrService extends Service {
         wmp.y = 100;
 
         iv.setOnTouchListener(new StackButtonDragListener());
-        wm.addView(iv, wmp);
-        */
+
 
 	}
 
@@ -134,10 +135,13 @@ public class StackPtrService extends Service {
             ifilter = new IntentFilter(ACTION_BATTERY_CHANGED);
             versioncode = String.format("%d", BuildConfig.VERSION_CODE);
 
+            PendingIntent overlayPendingIntent = PendingIntent.getBroadcast(ctx, 2, new Intent("com.stackunderflow.stackptr.overlay"), PendingIntent.FLAG_CANCEL_CURRENT);
+
             mBuilder = new NotificationCompat.Builder(this)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setContentTitle(getString(R.string.app_name))
                     .setContentText(getString(R.string.service_started))
+                    .setContentIntent(overlayPendingIntent)
                     .setOngoing(true);
 
             mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -145,6 +149,22 @@ public class StackPtrService extends Service {
             mNotifyMgr.notify(mNotificationId, not);
 
             startForeground(mNotificationId, not);
+
+
+
+            /////
+            IntentFilter filter = new IntentFilter("com.stackunderflow.stackptr.overlay");
+            BroadcastReceiver receiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (!overlayShown) {
+                        wm.addView(iv, wmp);
+                        overlayShown = true;
+                    }
+                }
+            };
+            registerReceiver(receiver, filter);
+
         }
 	}
 
@@ -153,7 +173,7 @@ public class StackPtrService extends Service {
 		super.onDestroy();
         Toast.makeText(this, getString(R.string.service_destroyed), Toast.LENGTH_LONG).show();
 
-        if (iv != null) {
+        if (iv != null && overlayShown) {
             wm.removeView(iv);
         }
 		//System.out.printf("service destroyed\n");
@@ -184,6 +204,10 @@ public class StackPtrService extends Service {
                         System.out.printf("up, drag\n");
                     } else {
                         System.out.printf("clicked\n");
+                        if (iv != null && overlayShown) {
+                            wm.removeView(iv);
+                            overlayShown = false;
+                        }
                     }
                     return true;
                 case MotionEvent.ACTION_MOVE:
@@ -307,11 +331,13 @@ public class StackPtrService extends Service {
             inboxStyle.addLine("from: " + loc.getProvider());
 
             Context ctx = getApplicationContext();
-            Intent appLaunchIntent = new Intent(ctx, StackPtr.class);
-            PendingIntent appLaunchPendingIntent = PendingIntent.getActivity(ctx, 1, appLaunchIntent, PendingIntent.FLAG_CANCEL_CURRENT); // FLAG_ACTIVITY_MULTIPLE_TASK |
+            //Intent appLaunchIntent = new Intent(ctx, StackPtr.class);
+            //PendingIntent appLaunchPendingIntent = PendingIntent.getActivity(ctx, 1, appLaunchIntent, PendingIntent.FLAG_CANCEL_CURRENT); // FLAG_ACTIVITY_MULTIPLE_TASK |
 
-			mBuilder.setStyle(inboxStyle);
-            mBuilder.setContentIntent(appLaunchPendingIntent);
+            PendingIntent overlayPendingIntent = PendingIntent.getBroadcast(ctx, 2, new Intent("com.stackunderflow.stackptr.overlay"), PendingIntent.FLAG_CANCEL_CURRENT);
+
+            mBuilder.setStyle(inboxStyle);
+            mBuilder.setContentIntent(overlayPendingIntent);
 			mNotifyMgr.notify(mNotificationId, mBuilder.build());
 			//Toast.makeText(getBaseContext(),notification_text, Toast.LENGTH_SHORT).show();
 		}
