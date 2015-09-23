@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,6 +16,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,6 +50,7 @@ public class StackPtr extends Activity {
     LocationManager fglm;
     LocationListener fgll;
     Location lastloc;
+    StackPtrCompassViewGroup spcvg;
 
     UserArrayAdapter adapter;
     JSONArray jUsers;
@@ -67,14 +70,15 @@ public class StackPtr extends Activity {
 		editor = settings.edit();
 
 
-
         //////////
         ListView listview = (ListView) findViewById(R.id.listView);
-
-        // requires context of the current Activity
         adapter = new UserArrayAdapter(this);
         listview.setAdapter(adapter);
 
+        spcvg = new StackPtrCompassViewGroup(ctx);
+        spcvg.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
+
+        listview.addHeaderView(spcvg);
 	}
 
 	@Override
@@ -89,6 +93,9 @@ public class StackPtr extends Activity {
         fglm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         fgll = new StackPtrFGListener();
         fglm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, fgll);
+
+        new ApiGetUsers().execute();
+
     }
 
     @Override
@@ -121,7 +128,6 @@ public class StackPtr extends Activity {
             case R.id.action_stop_service:
                 stopService(new Intent(this, StackPtrService.class));
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -223,6 +229,7 @@ public class StackPtr extends Activity {
         @Override
         protected void onPostExecute(String result) {
             adapter.notifyDataSetChanged();
+            spcvg.updateDataAndRepaint(jUsers,lastloc);
         }
 
         @Override
@@ -330,14 +337,6 @@ public class StackPtr extends Activity {
                     }
                 });
 
-                /*
-                mapButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent("com.stackunderflow.stackptr.StackPtrMap");
-                        startActivity(intent);
-                    }
-                });*/
 
 
             } catch (JSONException e) {

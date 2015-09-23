@@ -55,7 +55,9 @@ public class StackPtrService extends Service {
 
     private WindowManager wm;
     WindowManager.LayoutParams wmp;
-    private ImageView iv;
+    //private ImageView iv;
+
+    StackPtrCompassViewGroup iv;
 
     OkUrlFactory urlFactory;
 
@@ -74,13 +76,17 @@ public class StackPtrService extends Service {
 	@Override
 	public void onCreate() {
         super.onCreate();
+        ctx = getApplicationContext();
 		//Toast.makeText(this, "StackPtr service launched", Toast.LENGTH_LONG).show();
         urlFactory = new OkUrlFactory(new OkHttpClient());
 
 
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-        iv = new ImageView(this);
-        iv.setImageResource(R.drawable.ic_launcher);
+
+        //iv = new StackPtrCompassViewGroup(ctx);
+
+        //iv = new ImageView(this);
+        //iv.setImageResource(R.drawable.ic_launcher);
 
        wmp = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -93,7 +99,7 @@ public class StackPtrService extends Service {
         wmp.x = 0;
         wmp.y = 100;
 
-        iv.setOnTouchListener(new StackButtonDragListener());
+        //iv.setOnTouchListener(new StackButtonDragListener());
 
 
 	}
@@ -105,7 +111,6 @@ public class StackPtrService extends Service {
             Toast.makeText(this, getString(R.string.service_started), Toast.LENGTH_LONG).show();
             //System.out.printf("service started\n");
 
-            ctx = getApplicationContext();
             settings = PreferenceManager.getDefaultSharedPreferences(ctx);
             apikey = settings.getString("apikey", "");
 
