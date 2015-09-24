@@ -42,8 +42,7 @@ public class StackPtrApiGetUsers extends AsyncTask<StackPtrApiGetUsersParams, St
 
             int responseCode = userConnection.getResponseCode();
             if(responseCode != 200) {
-                publishProgress("Failed to update users: " + responseCode);
-                return "";
+                return "Failed to update users: " + responseCode;
             }
 
             InputStream in = userConnection.getInputStream();

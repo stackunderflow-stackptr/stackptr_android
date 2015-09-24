@@ -53,19 +53,14 @@ public class StackPtrService extends Service {
 	NotificationManager mNotifyMgr;
 	static int mNotificationId = 1;
 
-    private WindowManager wm;
-    WindowManager.LayoutParams wmp;
-    //private ImageView iv;
-
-    StackPtrCompassViewGroup iv;
-
     OkUrlFactory urlFactory;
+
+    StackPtrOverlay overlay;
 
     Context ctx;
     String versioncode;
     IntentFilter ifilter;
     Boolean hasStarted = false;
-    Boolean overlayShown = false;
 
 
     @Override
@@ -77,31 +72,9 @@ public class StackPtrService extends Service {
 	public void onCreate() {
         super.onCreate();
         ctx = getApplicationContext();
-		//Toast.makeText(this, "StackPtr service launched", Toast.LENGTH_LONG).show();
         urlFactory = new OkUrlFactory(new OkHttpClient());
 
-
-        wm = (WindowManager) getSystemService(WINDOW_SERVICE);
-
-        //iv = new StackPtrCompassViewGroup(ctx);
-
-        //iv = new ImageView(this);
-        //iv.setImageResource(R.drawable.ic_launcher);
-
-       wmp = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
-
-        wmp.gravity = Gravity.TOP | Gravity.LEFT;
-        wmp.x = 0;
-        wmp.y = 100;
-
-        //iv.setOnTouchListener(new StackButtonDragListener());
-
-
+        overlay = new StackPtrOverlay(ctx);
 	}
 
 	@Override
@@ -162,10 +135,7 @@ public class StackPtrService extends Service {
             BroadcastReceiver receiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    if (!overlayShown) {
-                        wm.addView(iv, wmp);
-                        overlayShown = true;
-                    }
+                    overlay.openOverlay();
                 }
             };
             registerReceiver(receiver, filter);
@@ -177,56 +147,9 @@ public class StackPtrService extends Service {
 	public void onDestroy() {
 		super.onDestroy();
         Toast.makeText(this, getString(R.string.service_destroyed), Toast.LENGTH_LONG).show();
+        overlay.closeOverlay();
 
-        if (iv != null && overlayShown) {
-            wm.removeView(iv);
-        }
-		//System.out.printf("service destroyed\n");
 	}
-
-
-	private class StackButtonDragListener implements View.OnTouchListener {
-
-        private int initialX;
-        private int initialY;
-        private float initialTouchX;
-        private float initialTouchY;
-        private boolean hasMoved;
-
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    initialX = wmp.x;
-                    initialY = wmp.y;
-                    initialTouchX = event.getRawX();
-                    initialTouchY = event.getRawY();
-                    hasMoved = false;
-                    System.out.printf("down\n");
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    if (hasMoved) {
-                        System.out.printf("up, drag\n");
-                    } else {
-                        System.out.printf("clicked\n");
-                        if (iv != null && overlayShown) {
-                            wm.removeView(iv);
-                            overlayShown = false;
-                        }
-                    }
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    wmp.x = initialX + (int) (event.getRawX() - initialTouchX);
-                    wmp.y = initialY + (int) (event.getRawY() - initialTouchY);
-                    wm.updateViewLayout(iv, wmp);
-                    hasMoved = true;
-                    System.out.printf("move\n");
-                    return true;
-                default:
-                    return false;
-            }
-        }
-    }
 
 	private class UpdateLocationTask extends AsyncTask<Location, String, Location> {
 
@@ -320,20 +243,18 @@ public class StackPtrService extends Service {
 				publishProgress("Exception updating position");
 			}
 			return loc;
-		}
+        }
 
-		@Override
+        @Override
 		protected void onPostExecute(Location loc) {
 			Time current = new Time(Time.getCurrentTimezone());
 			current.set(loc.getTime());
-			String notification_text = "Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude() + " at: " + current.format("%k:%M:%S") + "from: " + loc.getProvider();
+            String notification_text = "Updated at " + current.format("%k:%M:%S") + " with " + loc.getProvider();
 			mBuilder.setContentText(notification_text);
 			
 			NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-			inboxStyle.setBigContentTitle("Details:");
-			inboxStyle.addLine("Loc: " + loc.getLatitude() + " " + loc.getLongitude());
-            inboxStyle.addLine("at: " + current.format("%k:%M:%S"));
-            inboxStyle.addLine("from: " + loc.getProvider());
+			inboxStyle.setBigContentTitle("StackPtr");
+            inboxStyle.addLine("Updated at " + current.format("%k:%M:%S") + " with " + loc.getProvider());
 
             Context ctx = getApplicationContext();
             //Intent appLaunchIntent = new Intent(ctx, StackPtr.class);

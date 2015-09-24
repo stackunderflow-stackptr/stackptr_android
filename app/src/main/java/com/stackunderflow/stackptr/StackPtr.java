@@ -21,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.stackunderflow.stackptrapi.StackPtrApiGetUsers;
@@ -141,25 +142,29 @@ public class StackPtr extends Activity {
     private class StackPtrMainScreenApiGetUsers extends StackPtrApiGetUsers {
         @Override
         protected void onPostExecute(String result) {
-            jUsers = _jUsers;
-            adapter.notifyDataSetChanged();
+            if (result.equals("")) {
+                jUsers = _jUsers;
+                adapter.notifyDataSetChanged();
 
-            if (lastloc == null || lastloc.getProvider().equals("StackPtr")) {
-                lastloc = this.myLastServerLocation;
-            }
-
-            try {
-                tUsers.clear();
-                for (int i = 0; i < _jUsers.length(); i++) {
-                    JSONObject thisUser = _jUsers.getJSONObject(i);
-                    Integer user = thisUser.getInt("id");
-                    tUsers.add(user);
+                if (lastloc == null || lastloc.getProvider().equals("StackPtr")) {
+                    lastloc = this.myLastServerLocation;
                 }
-            } catch (JSONException e) {
-                System.out.println(e);
-            }
 
-            spcvg.updateDataAndRepaint(_jUsers,lastloc);
+                try {
+                    tUsers.clear();
+                    for (int i = 0; i < _jUsers.length(); i++) {
+                        JSONObject thisUser = _jUsers.getJSONObject(i);
+                        Integer user = thisUser.getInt("id");
+                        tUsers.add(user);
+                    }
+                } catch (JSONException e) {
+                    System.out.println(e);
+                }
+
+                spcvg.updateDataAndRepaint(_jUsers, lastloc);
+            } else {
+                Toast.makeText(getApplication().getBaseContext(), result, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
