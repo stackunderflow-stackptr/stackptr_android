@@ -1,22 +1,13 @@
 package com.stackunderflow.stackptr;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,35 +18,30 @@ import android.content.SharedPreferences;
 import android.view.Menu;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.OkUrlFactory;
 import com.squareup.picasso.Picasso;
+import com.stackunderflow.stackptrapi.StackPtrApiGetUsers;
+import com.stackunderflow.stackptrapi.StackPtrApiGetUsersParams;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class StackPtr extends Activity {
-
-	CheckBox debug;
-	SharedPreferences settings;
-	SharedPreferences.Editor editor;
+    SharedPreferences settings;
     LocationManager fglm;
     LocationListener fgll;
     Location lastloc;
     StackPtrCompassViewGroup spcvg;
 
-    UserArrayAdapter adapter;
+    StackPtrListViewArrayAdaptor adapter;
     JSONArray jUsers;
     ArrayList<Integer> tUsers;
-    JSONObject jMe;
+
+    StackPtrApiGetUsersParams spagup;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +49,14 @@ public class StackPtr extends Activity {
         tUsers = new ArrayList<Integer>();
 
         setContentView(R.layout.activity_stack_ptr);
-
 		Context ctx = getApplicationContext();
 		settings = PreferenceManager.getDefaultSharedPreferences(ctx);
-
-		editor = settings.edit();
+        spagup = new StackPtrApiGetUsersParams(settings);
 
 
         //////////
         ListView listview = (ListView) findViewById(R.id.listView);
-        adapter = new UserArrayAdapter(this);
+        adapter = new StackPtrListViewArrayAdaptor(this);
         listview.setAdapter(adapter);
 
         spcvg = new StackPtrCompassViewGroup(ctx);
@@ -94,7 +78,7 @@ public class StackPtr extends Activity {
         fgll = new StackPtrFGListener();
         fglm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, fgll);
 
-        new ApiGetUsers().execute();
+        new StackPtrMainScreenApiGetUsers().execute(spagup);
 
     }
 
@@ -119,7 +103,7 @@ public class StackPtr extends Activity {
                 startActivity(intent);
                 return true;
             case R.id.action_refresh_userlist:
-                new ApiGetUsers().execute();
+                new StackPtrMainScreenApiGetUsers().execute(spagup);
                 return true;
             case R.id.action_start_service:
                 // TODO: Check API key validity
@@ -133,124 +117,12 @@ public class StackPtr extends Activity {
         }
     }
 
-
-    private class ApiGetUsers extends AsyncTask<Void, String, String> {
-        @Override
-        protected String doInBackground(Void... params) {
-
-            OkUrlFactory urlFactory = new OkUrlFactory(new OkHttpClient());
-
-            publishProgress("Fetching user list...");
-
-            String apikey = settings.getString("apikey", "");
-            String serverHost = settings.getString("server_address", "https://stackptr.com");
-
-            if (apikey.equals("")) {
-                return "No API key set.";
-            }
-
-            try {
-                URL userurl = new URL(serverHost + "/users?apikey=" + apikey);
-                HttpURLConnection userConnection = urlFactory.open(userurl);
-
-                int responseCode = userConnection.getResponseCode();
-                if(responseCode != 200) {
-                    publishProgress("Failed to update users: " + responseCode);
-                    return "";
-                }
-
-                InputStream in = userConnection.getInputStream();
-                BufferedReader br2 = new BufferedReader(new InputStreamReader(in));
-
-                StringBuilder json = new StringBuilder();
-                String line;
-                while ((line = br2.readLine()) != null) {
-                	json.append(line);
-                }
-
-                JSONArray jUsersResponse = new JSONArray(json.toString());
-
-                jUsers = null;
-                jMe = null;
-
-                // fixme: more than one?
-                for (int i=0; i<jUsersResponse.length(); i++) {
-                    JSONObject msg = jUsersResponse.getJSONObject(i);
-                    String name = msg.getString("type");
-                    if (name.equals("user")) {
-                        jUsers = msg.getJSONArray("data");
-                    } else if (name.equals("user-me")) {
-                        jMe = msg.getJSONObject("data");
-                    }
-                }
-
-                if (jUsers == null) {
-                    return "no data";
-                }
-
-                if (jMe == null) {
-                    return "no data";
-                }
-
-
-                tUsers.clear();
-
-                if (lastloc == null) {
-
-                    JSONArray myloc = jMe.getJSONArray("loc");
-
-                    double mylat = myloc.getDouble(0);
-                    double mylon = myloc.getDouble(1);
-
-                    lastloc = new Location("StackPtr");
-                    lastloc.setLatitude(mylat);
-                    lastloc.setLongitude(mylon);
-
-                    //res.append("Using last location from web\n");
-                    // fixme: this is only printed once
-                }
-
-
-                for (int i=0; i<jUsers.length(); i++) {
-                    JSONObject thisUser = jUsers.getJSONObject(i);
-                    Integer user = thisUser.getInt("id");
-                    tUsers.add(user);
-                }
-
-                br2.close();
-                userConnection.disconnect();
-                return "";
-            } catch (Exception e) {
-                e.printStackTrace();
-                return "Error fetching list.";
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            adapter.notifyDataSetChanged();
-            spcvg.updateDataAndRepaint(jUsers,lastloc);
-        }
-
-        @Override
-        protected void onPreExecute() {
-
-        }
-
-        @Override
-        protected void onProgressUpdate(String... text) {
-            System.out.printf("%s\n", (Object) text);
-        }
-
-    }
-
     private class StackPtrFGListener implements LocationListener {
 
         @Override
         public void onLocationChanged(Location loc) {
-            //Toast.makeText(getBaseContext(), "Loc Updated", Toast.LENGTH_SHORT).show();
             lastloc = loc;
-            new ApiGetUsers().execute();
+            new StackPtrMainScreenApiGetUsers().execute(spagup);
         }
 
         @Override
@@ -266,10 +138,35 @@ public class StackPtr extends Activity {
         }
     }
 
-    private class UserArrayAdapter extends ArrayAdapter<Integer> {
+    private class StackPtrMainScreenApiGetUsers extends StackPtrApiGetUsers {
+        @Override
+        protected void onPostExecute(String result) {
+            jUsers = _jUsers;
+            adapter.notifyDataSetChanged();
+
+            if (lastloc == null || lastloc.getProvider().equals("StackPtr")) {
+                lastloc = this.myLastServerLocation;
+            }
+
+            try {
+                tUsers.clear();
+                for (int i = 0; i < _jUsers.length(); i++) {
+                    JSONObject thisUser = _jUsers.getJSONObject(i);
+                    Integer user = thisUser.getInt("id");
+                    tUsers.add(user);
+                }
+            } catch (JSONException e) {
+                System.out.println(e);
+            }
+
+            spcvg.updateDataAndRepaint(_jUsers,lastloc);
+        }
+    }
+
+    private class StackPtrListViewArrayAdaptor extends ArrayAdapter<Integer> {
         private final Context context;
 
-        public UserArrayAdapter(Context context) {
+        public StackPtrListViewArrayAdaptor(Context context) {
             super(context, R.layout.userview, tUsers);
             this.context = context;
         }

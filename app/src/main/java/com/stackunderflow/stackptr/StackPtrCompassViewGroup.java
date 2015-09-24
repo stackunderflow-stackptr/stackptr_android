@@ -16,6 +16,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 
 public class StackPtrCompassViewGroup extends ViewGroup {
 
@@ -31,15 +33,16 @@ public class StackPtrCompassViewGroup extends ViewGroup {
 
     public void updateDataAndRepaint(JSONArray jUsers, Location lastloc) {
         try {
-            System.out.println("repaint\n");
 
             Context context = this.getContext();
 
             double half_width = width / 2.0;
+            ArrayList<Integer> presentIds = new ArrayList<Integer>();
 
             for (int i = 0; i < jUsers.length(); i++) {
                 JSONObject thisUser = jUsers.getJSONObject(i);
                 Integer user = thisUser.getInt("id");
+                presentIds.add(user);
 
                 ImageView userView = views.get(user);
                 if (userView == null) {
@@ -81,11 +84,23 @@ public class StackPtrCompassViewGroup extends ViewGroup {
                 ycoord = Math.max(-half_width + 16, ycoord);
                 ycoord = Math.min(half_width - 16, ycoord);
 
-                System.out.printf("%f, %f, %f",xvect, yvect, r);
-
                 iconMove(userView, (int) xcoord, (int) ycoord, 64);
-
             }
+
+            // remove all the image views for users we didn't see again
+            ArrayList<Integer> viewsToRemove = new ArrayList<Integer>();
+            for (int i=0; i<views.size(); i++) {
+                Integer viewId = views.keyAt(i);
+                if (!presentIds.contains(viewId)) {
+                    viewsToRemove.add(viewId);
+                }
+            }
+            for (Integer rmView : viewsToRemove) {
+                ImageView view = views.get(rmView);
+                removeView(view);
+                views.remove(rmView);
+            }
+
         } catch (JSONException e) {
             System.out.print(e);
         }
@@ -109,9 +124,9 @@ public class StackPtrCompassViewGroup extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int contentWidth = getWidth() - getPaddingLeft() - getPaddingRight();
-        int contentHeight = getHeight() - getPaddingTop() - getPaddingBottom();
-        System.out.printf("left %d, top %d, right %d, bottom %d, width %d, height %d\n", left, top, right, bottom, contentWidth, contentHeight);
+        //int contentWidth = getWidth() - getPaddingLeft() - getPaddingRight();
+        //int contentHeight = getHeight() - getPaddingTop() - getPaddingBottom();
+        //System.out.printf("left %d, top %d, right %d, bottom %d, width %d, height %d\n", left, top, right, bottom, contentWidth, contentHeight);
     }
 
     Paint greenLine;
