@@ -283,11 +283,35 @@ public class StackPtrService extends Service {
 		@Override
 		public void onLocationChanged(Location loc) {
 			//if (loggedIn) {
-				new UpdateLocationTask().execute(loc);
+
+            if (loc.getAccuracy() > 150.0) {
+                Time current = new Time(Time.getCurrentTimezone());
+                current.set(loc.getTime());
+                String notification_text = loc.getProvider() + " @ " + current.format("%k:%M:%S") + " too inaccurate (" + loc.getAccuracy() + "m)";
+                updateMessage(notification_text);
+                return;
+            }
+
+			new UpdateLocationTask().execute(loc);
 			//} else {
 			//	Toast.makeText(getBaseContext(), "Tried to update location but you are not logged in.", Toast.LENGTH_SHORT).show();
 			//}
 		}
+
+        public void updateMessage(String message) {
+            mBuilder.setContentText(message);
+
+            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+            inboxStyle.setBigContentTitle("StackPtr");
+            inboxStyle.addLine(message);
+
+            Context ctx = getApplicationContext();
+            PendingIntent overlayPendingIntent = PendingIntent.getBroadcast(ctx, 2, new Intent("com.stackunderflow.stackptr.overlay"), PendingIntent.FLAG_CANCEL_CURRENT);
+
+            mBuilder.setStyle(inboxStyle);
+            mBuilder.setContentIntent(overlayPendingIntent);
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        }
 
 		@Override
 		public void onProviderDisabled(String arg0) {
