@@ -16,6 +16,16 @@
         android:icon="@android:drawable/ic_menu_close_clear_cancel"
         />
 
+    <item android:id="@+id/action_web_view"
+        android:title="Web View"
+        android:showAsAction="ifRoom"
+        />
+
+    <item android:id="@+id/action_new_placemark"
+        android:title="New Placemark"
+        android:showAsAction="ifRoom"
+        />
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

@@ -1,0 +1,174 @@
+html { 
+	height: 100%;
+}
+body { 
+	height: 100%;
+	margin: 0; 
+	padding: 0;
+}
+
+
+#usermenu {
+	position: absolute;
+	top: 60px;
+	right: 0px;
+	width: 320px;
+	z-index: 99;
+	background-color: rgba(0,0,0,0.8);
+	font-family: Helvetica, Arial, sans-serif;
+	color: #FFF;
+	/*overflow: scroll;*/
+}
+
+#groupmenu {
+	position: absolute;
+	width: 320px;
+	z-index: 98;
+	background-color: rgba(0,0,0,0.8);
+	font-family: Helvetica, Arial, sans-serif;
+	overflow: auto;
+}
+
+#loginmenu-place {
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 50px;
+	top: 5%;
+	width: 640px;
+}
+
+#loginmenu {
+	position: relative;
+	width: 640px;
+	z-index: 99;
+	background-color: rgba(0,0,0,0.8);
+	font-family: Helvetica, Arial, sans-serif;
+	color: #FFF;
+}
+
+#groupuserlist {
+	padding-bottom: 0.5em;
+}
+
+#groupadminlist {
+	padding-bottom: 0.5em;
+}
+
+.text-white {
+	color: #FFF;
+}
+
+.icon-white {
+	color: #FFF;
+	margin-top: 0.4em;
+	font-size: 1.2em;
+}
+
+#groupmenu_content {
+	overflow: auto;
+}
+
+#logo {
+	margin: 0px;
+}
+
+.fill {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    width: auto;
+    height: auto;
+}
+
+.angular-leaflet-map {
+	height: 100%;
+}
+
+.leaflet-top {
+	top: 50px;
+}
+
+.semitransparent {
+	opacity: 0.9;
+}
+
+.list-item-person {
+	padding: 5px 5px;
+}
+
+.list-item-draw {
+	padding: 5px 15px;
+}
+
+.hidden {
+	display: none;
+}
+
+.closebox {
+	color: #FFF;
+}
+
+.closebox:hover {
+	color: #000;
+}
+
+.user-icon {
+	margin: 2px;
+}
+
+.label {
+	display: block;
+	margin-top: 2px;
+}
+
+.userme-label {
+	color: #FFF;
+}
+
+.icon_type {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	background-image: url('images/spritesheet-2x.png');
+	background-size: 270px 30px;
+}
+
+.icon_LineString {
+	background-position: -2px -4px;
+}
+
+.icon_Polygon {
+	background-position: -31px -2px;
+}
+
+.icon_rectangle {
+	background-position: -62px -4px;
+}
+
+.icon_Point {
+	background-position: -122px -4px;
+}
+
+.leaflet-popup-content {
+    width:400px !important;
+}
+
+.modal-backdrop.am-fade {
+  opacity: .5;
+  transition: opacity .15s linear;
+  &.ng-enter {
+    opacity: 0;
+    &.ng-enter-active {
+      opacity: .5;
+    }
+  }
+  &.ng-leave {
+    opacity: .5;
+    &.ng-leave-active {
+      opacity: 0;
+    }
+  }
+}
