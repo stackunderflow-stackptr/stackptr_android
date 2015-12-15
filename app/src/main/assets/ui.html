@@ -46,8 +46,6 @@
         <ul class="nav navbar-nav hidden-sm hidden-xs">
             <li><a ng-click="toggleUserMenu()">Tracked Users</a></li>
             <li><a ng-click="toggleGroupMenu()">Groups</a></li>
-            <li><a href="/api/">Manage API keys</a></li>
-            <li><a href="https://stackptr.readthedocs.org/">API Docs</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right hidden-sm hidden-xs">
             <li class="dropdown">
@@ -57,7 +55,6 @@
                     </ul>
             </li>
             <li><a>[[status]]</a></li>
-            <li><a href="/logout">Log out</a></li>
         </ul>
         
         <ul class="nav navbar-nav navbar-right visible-sm-block visible-xs-block">
@@ -66,15 +63,11 @@
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-menu-hamburger"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="/api/">Manage API keys</a></li>
-                    <li><a href="https://stackptr.readthedocs.org/">API Docs</a></li>
-                    <li class="divider"></li>
                     <li ng-repeat="(tilename,tile) in tileservers"><a ng-click="setTileServer([[tilename]])">[[tile.name]]</a></li>
                     <li class="divider"></li>
                     <li><a>[[status]]</a></li>
                     <li class="divider"></li>
-                    <li><a>Logged in as: {{ current_user }}</a></li>
-                    <li><a href="/logout">Log out</a></li>
+                    <li><a onclick="StackPtrAndroidShim.showSettings()">Prefs</a></li>
                 </ul>
             </li>
         </ul>
