@@ -122,7 +122,8 @@ public class StackPtr extends Activity {
         public String serviceRunning() {
             ActivityManager m = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
             for (ActivityManager.RunningServiceInfo service : m.getRunningServices(Integer.MAX_VALUE)) {
-                if (service.service.getClassName().equals("com.stackunderflow.StackPtrService")) {
+                String serviceName = service.service.getClassName();
+                if (serviceName.equals("com.stackunderflow.stackptr.StackPtrService")) {
                     return "true";
                 }
             }
