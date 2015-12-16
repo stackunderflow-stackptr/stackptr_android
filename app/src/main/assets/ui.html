@@ -68,6 +68,9 @@
                     <li><a>[[status]]</a></li>
                     <li class="divider"></li>
                     <li><a onclick="StackPtrAndroidShim.showSettings()">Prefs</a></li>
+                    <li class="divider"></li>
+                    <li><a ng-if="serviceRunning" ng-click="stopService()">Stop Service</a></li>
+                    <li><a ng-if="!serviceRunning" ng-click="startService()">Start Service</a></li>
                 </ul>
             </li>
         </ul>
