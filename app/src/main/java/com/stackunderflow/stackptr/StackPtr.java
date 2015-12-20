@@ -1,40 +1,20 @@
 package com.stackunderflow.stackptr;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-
 import android.app.ActivityManager;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.view.Menu;
-import android.view.ViewGroup;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
-import com.stackunderflow.stackptrapi.StackPtrApiGetUsers;
-import com.stackunderflow.stackptrapi.StackPtrApiGetUsersParams;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class StackPtr extends Activity {
     SharedPreferences settings;
@@ -56,14 +36,22 @@ public class StackPtr extends Activity {
 
         //////////////
 
+
+
+
+
         String apikey = settings.getString("apikey", "");
 
         WebView wv = (WebView) findViewById(R.id.webview);
+
+        CookieSyncManager.createInstance(wv.getContext());
+        CookieManager.setAcceptFileSchemeCookies(true);
+        CookieManager.getInstance().setAcceptCookie(true);
+        CookieSyncManager.getInstance().startSync();
+
         WebSettings ws = wv.getSettings();
         ws.setJavaScriptEnabled(true);
         ws.setAllowUniversalAccessFromFileURLs(true);
-
-        //wv.loadUrl("http://172.16.0.196:8080/?apikey=" + URLEncoder.encode(apikey));
 
         wv.addJavascriptInterface(new StackPtrAndroidShim(this), "StackPtrAndroidShim");
 
@@ -79,6 +67,7 @@ public class StackPtr extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+        CookieSyncManager.getInstance().startSync();
 
         //fglm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //fgll = new StackPtrFGListener();
@@ -90,6 +79,9 @@ public class StackPtr extends Activity {
     public void onPause() {
         super.onPause();
         //fglm.removeUpdates(fgll);
+        CookieSyncManager.getInstance().stopSync();
+
+
     }
 
 
