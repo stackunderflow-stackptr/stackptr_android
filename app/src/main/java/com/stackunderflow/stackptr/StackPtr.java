@@ -1,6 +1,8 @@
 package com.stackunderflow.stackptr;
 
 import android.app.ActivityManager;
+import android.graphics.Color;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ public class StackPtr extends Activity {
     SharedPreferences settings;
     LocationManager fglm;
     LocationListener fgll;
+    WebView wv;
 
 
     @Override
@@ -33,16 +36,10 @@ public class StackPtr extends Activity {
 
         //////////
 
-
-        //////////////
-
-
-
-
-
         String apikey = settings.getString("apikey", "");
 
-        WebView wv = (WebView) findViewById(R.id.webview);
+        wv = (WebView) findViewById(R.id.webview);
+        wv.setBackgroundColor(Color.TRANSPARENT);
 
         CookieSyncManager.createInstance(wv.getContext());
         CookieManager.setAcceptFileSchemeCookies(true);
@@ -69,18 +66,21 @@ public class StackPtr extends Activity {
         super.onResume();
         CookieSyncManager.getInstance().startSync();
 
-        //fglm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        //fgll = new StackPtrFGListener();
-        //fglm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, fgll);
+        fglm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        fgll = new StackPtrFGListener();
+        fglm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, fgll);
+
+        wv.loadUrl("javascript:StackPtrConnect()");
 
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //fglm.removeUpdates(fgll);
+        fglm.removeUpdates(fgll);
         CookieSyncManager.getInstance().stopSync();
 
+        wv.loadUrl("javascript:StackPtrDisconnect()");
 
     }
 
@@ -131,6 +131,25 @@ public class StackPtr extends Activity {
         public void serviceStart() {
             System.out.println("starting service");
             startService(new Intent(parent, StackPtrService.class));
+        }
+    }
+
+    private class StackPtrFGListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location loc) {
+        }
+
+        @Override
+        public void onProviderDisabled(String arg0) {
+        }
+
+        @Override
+        public void onProviderEnabled(String arg0) {
+        }
+
+        @Override
+        public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
         }
     }
 
