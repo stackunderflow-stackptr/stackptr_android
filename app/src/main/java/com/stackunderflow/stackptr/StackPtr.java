@@ -111,6 +111,12 @@ public class StackPtr extends Activity {
         }
 
         @JavascriptInterface
+        public void showLogins() {
+            Intent intent = new Intent("com.stackunderflow.stackptr.login");
+            startActivity(intent);
+        }
+
+        @JavascriptInterface
         public String serviceRunning() {
             ActivityManager m = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
             for (ActivityManager.RunningServiceInfo service : m.getRunningServices(Integer.MAX_VALUE)) {

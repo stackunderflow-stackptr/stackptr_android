@@ -92,7 +92,7 @@
         android:textColor="#CCC"
         android:layout_below="@+id/btnScanQR"
 
-        />
+        android:layout_alignParentBottom="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -121,5 +121,20 @@
         android:src="@android:drawable/ic_menu_camera"
         android:contentDescription="@string/btn_scan_qr"
         />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/btnScanQR"
+        android:layout_above="@+id/version"
+        android:weightSum="1">
+
+        <ImageView
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:id="@+id/avatarView" />
+    </LinearLayout>
 
 </RelativeLayout>

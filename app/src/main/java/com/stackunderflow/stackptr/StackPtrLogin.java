@@ -35,7 +35,7 @@ public class StackPtrLogin extends Activity {
     EditText userField;
     EditText passField;
     EditText apikeyField;
-    TextView statusField;
+    TextView statusView;
     TextView version;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
@@ -51,6 +51,7 @@ public class StackPtrLogin extends Activity {
         passField = (EditText) findViewById(R.id.passField);
         apikeyField = (EditText) findViewById(R.id.ApiKeyField);
         version = (TextView) findViewById(R.id.version);
+        statusView = (TextView) findViewById(R.id.statusView);
 
         Context ctx = getApplicationContext();
         settings = PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -62,6 +63,8 @@ public class StackPtrLogin extends Activity {
         version.setText(String.format("Version %d", BuildConfig.VERSION_CODE));
         urlFactory = new OkUrlFactory(new OkHttpClient());
 
+        new ApiCheckLogin().execute("apikey");
+
     }
 
     public void doLogin(View view )  {
@@ -72,7 +75,7 @@ public class StackPtrLogin extends Activity {
         editor.putString("username", username);
         editor.apply();
 
-        new ApiGetTask().execute(username, password);
+        new ApiDoLogin().execute(username, password);
     }
 
     public void scanQR(View view) {
@@ -98,8 +101,65 @@ public class StackPtrLogin extends Activity {
 		editor.apply();
     }
 
-    private class ApiGetTask extends AsyncTask<String, String, String> {
+    private class ApiCheckLogin extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            try {
 
+
+                String serverHost = settings.getString("server_address", "https://stackptr.com");
+                URL apikeyurl = new URL(serverHost + "/uid");
+
+                HttpURLConnection uc3 = urlFactory.open(apikeyurl);
+                uc3.setRequestMethod("POST");
+                uc3.setDoOutput(true);
+                uc3.setDoInput(true);
+                OutputStream os2 = uc3.getOutputStream();
+                BufferedWriter w3 = new BufferedWriter(new OutputStreamWriter(os2));
+
+                String apikey = settings.getString("apikey", "");
+                w3.write("apikey=" + URLEncoder.encode(apikey, "UTF-8"));
+                w3.flush();
+                w3.close();
+                int rc = uc3.getResponseCode();
+                BufferedReader br3 = new BufferedReader(new InputStreamReader(uc3.getInputStream()));
+                String res = br3.readLine();
+                br3.close();
+                uc3.disconnect();
+                return res;
+
+            } catch (Exception e) {
+                return "failed";
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+            //apikeyField.setText(settings.getString("apikey", ""));
+
+            statusView.setText(result);
+
+
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+
+        @Override
+        protected void onProgressUpdate(String... text) {
+            //Toast.makeText(getBaseContext(), text[0], Toast.LENGTH_SHORT).show();
+            //System.out.println(text[0]);
+        }
+
+
+    }
+
+    private class ApiDoLogin extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... params) {
             publishProgress("Fetching token");
