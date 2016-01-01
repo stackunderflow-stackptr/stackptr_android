@@ -127,14 +127,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/btnScanQR"
         android:layout_above="@+id/version"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:layout_alignTop="@+id/statusView"
+        android:id="@+id/UserLayout">
 
         <ImageView
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:id="@+id/avatarView" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="username"
+                android:id="@+id/usernameView" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="status"
+                android:id="@+id/statusView" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

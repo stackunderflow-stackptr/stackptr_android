@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -28,6 +30,11 @@ import java.net.URLEncoder;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class StackPtrLogin extends Activity {
@@ -37,10 +44,13 @@ public class StackPtrLogin extends Activity {
     EditText apikeyField;
     TextView statusView;
     TextView version;
+    ImageView avatarView;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
 
     OkUrlFactory urlFactory;
+
+    Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +62,10 @@ public class StackPtrLogin extends Activity {
         apikeyField = (EditText) findViewById(R.id.ApiKeyField);
         version = (TextView) findViewById(R.id.version);
         statusView = (TextView) findViewById(R.id.statusView);
+        avatarView = (ImageView) findViewById(R.id.avatarView);
 
         Context ctx = getApplicationContext();
+
         settings = PreferenceManager.getDefaultSharedPreferences(ctx);
         editor = settings.edit();
 
@@ -101,9 +113,9 @@ public class StackPtrLogin extends Activity {
 		editor.apply();
     }
 
-    private class ApiCheckLogin extends AsyncTask<String, String, String> {
+    private class ApiCheckLogin extends AsyncTask<String, String, JSONObject> {
         @Override
-        protected String doInBackground(String... params) {
+        protected JSONObject doInBackground(String... params) {
             try {
 
 
@@ -122,24 +134,50 @@ public class StackPtrLogin extends Activity {
                 w3.flush();
                 w3.close();
                 int rc = uc3.getResponseCode();
-                BufferedReader br3 = new BufferedReader(new InputStreamReader(uc3.getInputStream()));
-                String res = br3.readLine();
-                br3.close();
+
+                if (rc != 200) {
+                    System.out.println("Non-200 response code");
+                }
+
+                InputStream in = uc3.getInputStream();
+                BufferedReader br2 = new BufferedReader(new InputStreamReader(in));
+
+                StringBuilder json = new StringBuilder();
+                String line;
+                while ((line = br2.readLine()) != null) {
+                    json.append(line);
+                }
+
+                JSONObject jUser = new JSONObject(json.toString());
+
+                br2.close();
                 uc3.disconnect();
-                return res;
+
+                return jUser;
 
             } catch (Exception e) {
-                return "failed";
+                publishProgress(e.toString());
             }
+            return null;
 
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
-            //apikeyField.setText(settings.getString("apikey", ""));
+        protected void onPostExecute(JSONObject jUser) {
 
-            statusView.setText(result);
+            try {
+                String username = jUser.getString("username");
+                String id = jUser.getString("id");
+                String icon = jUser.getString("icon");
+
+                Context ctx = getApplicationContext();
+                Picasso.with(ctx).load(icon).into(avatarView);
+
+            } catch (JSONException e) {
+                System.out.println("Error parsing JSON");
+            }
+
+            System.out.println(jUser.toString());
 
 
         }
@@ -152,6 +190,7 @@ public class StackPtrLogin extends Activity {
 
         @Override
         protected void onProgressUpdate(String... text) {
+            statusView.setText(text[0]);
             //Toast.makeText(getBaseContext(), text[0], Toast.LENGTH_SHORT).show();
             //System.out.println(text[0]);
         }
