@@ -42,8 +42,9 @@ public class StackPtrLogin extends Activity {
     EditText userField;
     EditText passField;
     EditText apikeyField;
-    TextView statusView;
     TextView version;
+    TextView statusTextField;
+    TextView usernameView;
     ImageView avatarView;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
@@ -61,8 +62,9 @@ public class StackPtrLogin extends Activity {
         passField = (EditText) findViewById(R.id.passField);
         apikeyField = (EditText) findViewById(R.id.ApiKeyField);
         version = (TextView) findViewById(R.id.version);
-        statusView = (TextView) findViewById(R.id.statusView);
+        statusTextField = (TextView) findViewById(R.id.statusTextField);
         avatarView = (ImageView) findViewById(R.id.avatarView);
+        usernameView = (TextView) findViewById(R.id.usernameView);
 
         Context ctx = getApplicationContext();
 
@@ -118,7 +120,6 @@ public class StackPtrLogin extends Activity {
         protected JSONObject doInBackground(String... params) {
             try {
 
-
                 String serverHost = settings.getString("server_address", "https://stackptr.com");
                 URL apikeyurl = new URL(serverHost + "/uid");
 
@@ -136,7 +137,8 @@ public class StackPtrLogin extends Activity {
                 int rc = uc3.getResponseCode();
 
                 if (rc != 200) {
-                    System.out.println("Non-200 response code");
+                    publishProgress("Response code was " + rc);
+                    return null;
                 }
 
                 InputStream in = uc3.getInputStream();
@@ -164,35 +166,28 @@ public class StackPtrLogin extends Activity {
 
         @Override
         protected void onPostExecute(JSONObject jUser) {
+            if (jUser != null) {
+                try {
+                    String username = jUser.getString("username");
+                    String icon = jUser.getString("icon");
 
-            try {
-                String username = jUser.getString("username");
-                String id = jUser.getString("id");
-                String icon = jUser.getString("icon");
+                    Context ctx = getApplicationContext();
+                    Picasso.with(ctx).load(icon).into(avatarView);
 
-                Context ctx = getApplicationContext();
-                Picasso.with(ctx).load(icon).into(avatarView);
+                    usernameView.setText(username);
+                    statusTextField.setText("Successfully logged in.");
 
-            } catch (JSONException e) {
-                System.out.println("Error parsing JSON");
+                } catch (JSONException e) {
+                    statusTextField.setText("Error parsing server response.");
+                }
             }
-
-            System.out.println(jUser.toString());
-
-
         }
 
-
-        @Override
-        protected void onPreExecute() {
-        }
 
 
         @Override
         protected void onProgressUpdate(String... text) {
-            statusView.setText(text[0]);
-            //Toast.makeText(getBaseContext(), text[0], Toast.LENGTH_SHORT).show();
-            //System.out.println(text[0]);
+            statusTextField.setText(text[0]);
         }
 
 
