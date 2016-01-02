@@ -111,7 +111,7 @@ public class StackPtr extends Activity {
         }
 
         @JavascriptInterface
-        public void showLogins() {
+        public void showLogin() {
             Intent intent = new Intent("com.stackunderflow.stackptr.login");
             startActivity(intent);
         }
