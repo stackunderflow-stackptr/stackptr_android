@@ -120,6 +120,15 @@ public class StackPtrLogin extends Activity {
         protected JSONObject doInBackground(String... params) {
             try {
 
+                String apikey = settings.getString("apikey", "");
+
+                String apikey_reason = StackPtrUtils.apiKeyValid(apikey);
+
+                if (apikey_reason != null) {
+                    publishProgress(apikey_reason);
+                    return null;
+                }
+
                 String serverHost = settings.getString("server_address", "https://stackptr.com");
                 URL apikeyurl = new URL(serverHost + "/uid");
 
@@ -130,7 +139,6 @@ public class StackPtrLogin extends Activity {
                 OutputStream os2 = uc3.getOutputStream();
                 BufferedWriter w3 = new BufferedWriter(new OutputStreamWriter(os2));
 
-                String apikey = settings.getString("apikey", "");
                 w3.write("apikey=" + URLEncoder.encode(apikey, "UTF-8"));
                 w3.flush();
                 w3.close();

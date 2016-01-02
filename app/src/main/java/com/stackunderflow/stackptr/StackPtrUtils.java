@@ -150,5 +150,25 @@ public class StackPtrUtils {
         });
         dlgAlert.show();
     }
+
+    /**
+     * Do a check to see if an API key "looks" valid. Returns a reason why not if not, else Null.
+     *
+     * @param apikey The API key to test.
+     */
+
+    public static String apiKeyValid(String apikey) {
+        int keylen = apikey.length();
+        if (keylen == 0) {
+            return "API key is empty.";
+        } else if (apikey.length() != 32) {
+            return "API key should be 32 characters long.";
+        }
+
+        if (!apikey.matches("^[a-zA-Z0-9]+")) {
+            return "API key contains invalid characters";
+        }
+        return null;
+    }
     
 }
