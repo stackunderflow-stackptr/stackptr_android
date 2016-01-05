@@ -164,6 +164,22 @@ public class StackPtr extends Activity {
             System.out.println("starting service");
             startService(new Intent(parent, StackPtrService.class));
         }
+
+        @JavascriptInterface
+        public void shareLocation(String lat, String lon, String username) {
+            Uri.Builder b = new Uri.Builder();
+            b.scheme("geo");
+            b.encodedOpaquePart(lat + "," + lon + "?q=" + lat + "," + lon + "(" + username + ")");
+
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(b.build());
+            if (i.resolveActivity(getPackageManager()) != null) {
+                startActivity(i);
+            } else {
+                // Mainly a concern for the emulator and non-GApps devices
+                StackPtrUtils.showAlertDialog(getApplicationContext(), getString(R.string.no_map_title), getString(R.string.no_map_message));
+            }
+        }
     }
 
     private class StackPtrFGListener implements LocationListener {
