@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
@@ -23,6 +24,8 @@ public class StackPtr extends Activity {
     LocationManager fglm;
     LocationListener fgll;
     WebView wv;
+    String startup_apikey;
+    String startup_server;
 
 
     @Override
@@ -33,10 +36,7 @@ public class StackPtr extends Activity {
         Context ctx = getApplicationContext();
         settings = PreferenceManager.getDefaultSharedPreferences(ctx);
 
-
         //////////
-
-        String apikey = settings.getString("apikey", "");
 
         wv = (WebView) findViewById(R.id.webview);
         wv.setBackgroundColor(Color.TRANSPARENT);
@@ -52,8 +52,23 @@ public class StackPtr extends Activity {
 
         wv.addJavascriptInterface(new StackPtrAndroidShim(this), "StackPtrAndroidShim");
 
-        wv.loadUrl("file:///android_asset/ui.html");
 
+        String startup_apikey = settings.getString("apikey", "");
+        String apikey_reason = StackPtrUtils.apiKeyValid(startup_apikey);
+
+        if (apikey_reason != null) {
+            Intent intent = new Intent("com.stackunderflow.stackptr.login");
+            startActivity(intent);
+        } else {
+            reloadPage();
+        }
+
+    }
+
+    private void reloadPage() {
+        startup_apikey = settings.getString("apikey", "");
+        startup_server = settings.getString("server_address", "");
+        wv.loadUrl("file:///android_asset/ui.html");
     }
 
     @Override
@@ -70,7 +85,18 @@ public class StackPtr extends Activity {
         fgll = new StackPtrFGListener();
         fglm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, fgll);
 
-        wv.loadUrl("javascript:StackPtrConnect()");
+        String apikey = settings.getString("apikey", "");
+        String server = settings.getString("server_address", "");
+
+        if (startup_apikey != null && startup_server != null) {
+            if (startup_apikey.equals(apikey) && startup_server.equals(server)) {
+                System.out.println("resuming");
+                wv.loadUrl("javascript:StackPtrConnect()");
+            } else {
+                System.out.println("api key changed, reloading");
+                reloadPage();
+            }
+        }
 
     }
 
