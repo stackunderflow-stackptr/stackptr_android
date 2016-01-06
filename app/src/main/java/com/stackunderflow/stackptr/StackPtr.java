@@ -53,22 +53,31 @@ public class StackPtr extends Activity {
         wv.addJavascriptInterface(new StackPtrAndroidShim(this), "StackPtrAndroidShim");
 
 
-        String startup_apikey = settings.getString("apikey", "");
+        startup_apikey = settings.getString("apikey", "");
         String apikey_reason = StackPtrUtils.apiKeyValid(startup_apikey);
 
         if (apikey_reason != null) {
-            Intent intent = new Intent("com.stackunderflow.stackptr.login");
-            startActivity(intent);
+            saveStartupAPIKeys();
+            launchLogin();
         } else {
             reloadPage();
         }
 
     }
 
-    private void reloadPage() {
+    private void saveStartupAPIKeys() {
         startup_apikey = settings.getString("apikey", "");
-        startup_server = settings.getString("server_address", "");
+        startup_server = settings.getString("server_address", StackPtrUtils.default_server);
+    }
+
+    private void reloadPage() {
+        saveStartupAPIKeys();
         wv.loadUrl("file:///android_asset/ui.html");
+    }
+
+    private void launchLogin() {
+        Intent intent = new Intent("com.stackunderflow.stackptr.login");
+        startActivity(intent);
     }
 
     @Override
@@ -86,16 +95,21 @@ public class StackPtr extends Activity {
         fglm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0.0f, fgll);
 
         String apikey = settings.getString("apikey", "");
-        String server = settings.getString("server_address", "");
+        String server = settings.getString("server_address", StackPtrUtils.default_server);
 
         if (startup_apikey != null && startup_server != null) {
             if (startup_apikey.equals(apikey) && startup_server.equals(server)) {
-                System.out.println("resuming");
+                System.out.println("onResume: reconnecting");
+                if (StackPtrUtils.apiKeyValid(startup_apikey) != null) {
+                    launchLogin();
+                }
                 wv.loadUrl("javascript:StackPtrConnect()");
             } else {
-                System.out.println("api key changed, reloading");
+                System.out.println("onResume: api key changed, reloading");
                 reloadPage();
             }
+        } else {
+            System.out.println("onResume: startup_apikey not defined");
         }
 
     }
@@ -122,7 +136,7 @@ public class StackPtr extends Activity {
 
         @JavascriptInterface
         public String get_host() {
-            return settings.getString("server_address", "");
+            return settings.getString("server_address", StackPtrUtils.default_server);
         }
 
         @JavascriptInterface

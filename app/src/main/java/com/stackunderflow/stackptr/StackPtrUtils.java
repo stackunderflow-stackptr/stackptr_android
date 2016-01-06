@@ -160,7 +160,7 @@ public class StackPtrUtils {
     public static String apiKeyValid(String apikey) {
         int keylen = apikey.length();
         if (keylen == 0) {
-            return "API key is empty.";
+            return "API key is empty. Please login to your account.";
         } else if (apikey.length() != 32) {
             return "API key should be 32 characters long.";
         }
@@ -170,5 +170,8 @@ public class StackPtrUtils {
         }
         return null;
     }
+
+    // default server for stackptr client
+    public static String default_server = "https://stackptr.com";
     
 }

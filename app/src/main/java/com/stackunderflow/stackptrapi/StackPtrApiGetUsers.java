@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
+import com.stackunderflow.stackptr.StackPtrUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,7 +31,7 @@ public class StackPtrApiGetUsers extends AsyncTask<StackPtrApiGetUsersParams, St
         publishProgress("Fetching user list...");
 
         String apikey = settings.getString("apikey", "");
-        String serverHost = settings.getString("server_address", "https://stackptr.com");
+        String serverHost = settings.getString("server_address", StackPtrUtils.default_server);
 
         if (apikey == null || apikey.equals("")) {
             return "No API key set.";

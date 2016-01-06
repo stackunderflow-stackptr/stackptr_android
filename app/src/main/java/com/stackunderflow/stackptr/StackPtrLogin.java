@@ -129,7 +129,7 @@ public class StackPtrLogin extends Activity {
                     return null;
                 }
 
-                String serverHost = settings.getString("server_address", "https://stackptr.com");
+                String serverHost = settings.getString("server_address", StackPtrUtils.default_server);
                 URL apikeyurl = new URL(serverHost + "/uid");
 
                 HttpURLConnection uc3 = urlFactory.open(apikeyurl);
@@ -212,7 +212,7 @@ public class StackPtrLogin extends Activity {
                 CookieHandler.setDefault(cookieManager);
 
                 // fetch CSRF token
-                String serverHost = settings.getString("server_address", "https://stackptr.com");
+                String serverHost = settings.getString("server_address", StackPtrUtils.default_server);
                 URL csrfurl = new URL(serverHost + "/csrf");
                 HttpURLConnection csrfConnection = urlFactory.open(csrfurl);
                 BufferedReader br = new BufferedReader(new InputStreamReader(csrfConnection.getInputStream()));
