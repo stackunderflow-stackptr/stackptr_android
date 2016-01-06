@@ -77,7 +77,7 @@ public class StackPtrLogin extends Activity {
         version.setText(String.format("Version %d", BuildConfig.VERSION_CODE));
         urlFactory = new OkUrlFactory(new OkHttpClient());
 
-        new ApiCheckLogin().execute("apikey");
+        new ApiCheckLogin().execute();
 
     }
 
@@ -115,9 +115,9 @@ public class StackPtrLogin extends Activity {
 		editor.apply();
     }
 
-    private class ApiCheckLogin extends AsyncTask<String, String, JSONObject> {
+    private class ApiCheckLogin extends AsyncTask<Void, String, JSONObject> {
         @Override
-        protected JSONObject doInBackground(String... params) {
+        protected JSONObject doInBackground(Void... params) {
             try {
 
                 String apikey = settings.getString("apikey", "");
@@ -298,6 +298,7 @@ public class StackPtrLogin extends Activity {
         protected void onPostExecute(String result) {
             Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
             apikeyField.setText(settings.getString("apikey", ""));
+            new ApiCheckLogin().execute();
         }
 
 
