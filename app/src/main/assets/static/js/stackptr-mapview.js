@@ -735,6 +735,9 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 		$scope.status = "Disconnected: " + data.reason;
 		$scope.reason = data.reason;
 		$scope.details = data.details;
+		if (!(typeof stackptr_connection_failed === 'undefined')) {
+        	stackptr_connection_failed(data.reason, data.details);
+        }
 	});
 
 	$scope.processWS = function(type, data) {
@@ -774,6 +777,12 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 			$("#groupmenu").toggle();
 		}
 	}
+
+	$scope.share_user = function(obj) {
+		if (!(typeof stackptr_share_user === 'undefined')) {
+           	stackptr_share_user(obj);
+        }
+    }
 
 }]);
 
