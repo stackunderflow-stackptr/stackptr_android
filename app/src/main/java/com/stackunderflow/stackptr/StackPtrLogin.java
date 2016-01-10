@@ -120,6 +120,9 @@ public class StackPtrLogin extends Activity {
         protected JSONObject doInBackground(Void... params) {
             try {
 
+                CookieManager cookieManager = new CookieManager();
+                CookieHandler.setDefault(cookieManager);
+
                 String apikey = settings.getString("apikey", "");
 
                 String apikey_reason = StackPtrUtils.apiKeyValid(apikey);
