@@ -119,9 +119,7 @@ public class StackPtrLogin extends Activity {
         @Override
         protected JSONObject doInBackground(Void... params) {
             try {
-
-                CookieManager cookieManager = new CookieManager();
-                CookieHandler.setDefault(cookieManager);
+                CookieHandler.setDefault(null);
 
                 String apikey = settings.getString("apikey", "");
 
