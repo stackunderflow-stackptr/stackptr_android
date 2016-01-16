@@ -1,12 +1,15 @@
 package com.stackunderflow.stackptr;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,6 +28,8 @@ import java.io.OutputStreamWriter;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -32,7 +37,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,6 +50,7 @@ public class StackPtrLogin extends Activity {
     TextView version;
     TextView statusTextField;
     TextView usernameView;
+    TextView lblLoginHeader;
     ImageView avatarView;
     SharedPreferences settings;
     SharedPreferences.Editor editor;
@@ -65,11 +71,15 @@ public class StackPtrLogin extends Activity {
         statusTextField = (TextView) findViewById(R.id.statusTextField);
         avatarView = (ImageView) findViewById(R.id.avatarView);
         usernameView = (TextView) findViewById(R.id.usernameView);
+        lblLoginHeader = (TextView) findViewById(R.id.lblLoginHeader);
+
 
         Context ctx = getApplicationContext();
 
         settings = PreferenceManager.getDefaultSharedPreferences(ctx);
         editor = settings.edit();
+
+        setServerLabel();
 
         userField.setText(settings.getString("username", ""));
         apikeyField.setText(settings.getString("apikey", ""));
@@ -77,7 +87,7 @@ public class StackPtrLogin extends Activity {
         version.setText(String.format("Version %d", BuildConfig.VERSION_CODE));
         urlFactory = new OkUrlFactory(new OkHttpClient());
 
-        new ApiCheckLogin().execute();
+        checkAPILogin();
 
     }
 
@@ -103,6 +113,65 @@ public class StackPtrLogin extends Activity {
             editor.putString("apikey", scanResult.getContents());
             editor.apply();
             apikeyField.setText(settings.getString("apikey", ""));
+        }
+    }
+
+    public void checkAPILogin() {
+        new ApiCheckLogin().execute();
+    }
+
+    public void changeServer(View view) {
+
+       /* <EditTextPreference android:title=""
+        android:key="server_address"
+        android:text="@string/text_server_address"
+        android:defaultValue="https://stackptr.com"
+                />*/
+
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.title_server_address));
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(settings.getString("server_address", StackPtrUtils.default_server));
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String server_addr = input.getText().toString();
+
+                editor.putString("server_address", server_addr);
+                editor.putString("apikey","");
+                apikeyField.setText("");
+                editor.apply();
+
+                setServerLabel();
+                checkAPILogin();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+
+    }
+
+    public void setServerLabel() {
+        String headingPrefix = getString(R.string.heading_create_key);
+        String serverName = settings.getString("server_address", StackPtrUtils.default_server);
+        try {
+            URI stackPtrServer = new URI(serverName);
+            String heading = headingPrefix + " " + stackPtrServer.getHost();
+            lblLoginHeader.setText(heading);
+        } catch (URISyntaxException e) {
+            System.out.println("failed");
         }
     }
 
@@ -134,6 +203,7 @@ public class StackPtrLogin extends Activity {
                 URL apikeyurl = new URL(serverHost + "/uid");
 
                 HttpURLConnection uc3 = urlFactory.open(apikeyurl);
+                uc3.setInstanceFollowRedirects(false);
                 uc3.setRequestMethod("POST");
                 uc3.setDoOutput(true);
                 uc3.setDoInput(true);
@@ -144,9 +214,13 @@ public class StackPtrLogin extends Activity {
                 w3.flush();
                 w3.close();
                 int rc = uc3.getResponseCode();
+                System.out.println("rc = " + rc);
 
-                if (rc != 200) {
-                    publishProgress("Response code was " + rc);
+                if (rc == 302) {
+                    publishProgress("Failed to log into the server with provided API key");
+                    return null;
+                } else if (rc != 200) {
+                    publishProgress("Failed to communicate with the server (response code was " + rc + ")");
                     return null;
                 }
 
@@ -299,7 +373,7 @@ public class StackPtrLogin extends Activity {
         protected void onPostExecute(String result) {
             Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
             apikeyField.setText(settings.getString("apikey", ""));
-            new ApiCheckLogin().execute();
+            checkAPILogin();
         }
 
 

@@ -24,7 +24,7 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:22.2.0'
-    compile 'com.squareup.okhttp:okhttp:2.0.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+    compile 'com.squareup.okhttp3:okhttp:3.0.1'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.2'
     compile 'com.squareup.picasso:picasso:2.3.2'
 }

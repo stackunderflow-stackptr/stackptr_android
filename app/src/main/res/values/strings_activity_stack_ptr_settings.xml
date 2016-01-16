@@ -2,7 +2,7 @@
     <string name="title_activity_stack_ptr_settings">Settings</string>
 
 
-    <string name="pref_login">Account Information…</string>
+    <string name="pref_login">Account and Server...</string>
 
     <string name="title_autostart">Start Service on Boot</string>
     <string name="title_network_in_bg">Use Network Location when no GPS app active</string>
