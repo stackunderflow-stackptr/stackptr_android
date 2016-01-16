@@ -301,7 +301,6 @@ public class StackPtrLogin extends Activity {
                 editor = settings.edit();
 
                 // now do the login
-                //publishProgress("Sending login");
                 URL loginurl = new URL(serverHost + "/login");
                 HttpURLConnection urlConnection2 = urlFactory.open(loginurl);
                 urlConnection2.setRequestMethod("POST");
@@ -320,17 +319,9 @@ public class StackPtrLogin extends Activity {
                 writer.close();
                 int responseCode = urlConnection2.getResponseCode();
 
-                /*
-                BufferedReader br2 = new BufferedReader(new InputStreamReader(urlConnection2.getInputStream()));
-                String line;
-                while ((line = br2.readLine()) != null) {
-                	System.out.println(line);
-                }
-*/
 
                 urlConnection2.disconnect();
 
-                // TODO: fix properly so that this doesn't follow redirect
                 if (responseCode == 302 || responseCode == 200) {
                     publishProgress(getString(R.string.login_success));
                 } else {
@@ -363,13 +354,17 @@ public class StackPtrLogin extends Activity {
                 editor.apply();
 
                 publishProgress(getString(R.string.created_api_key));
+                return "Logged in successfully.";
 
 
+            } catch (java.net.ConnectException e) {
+                return "Failed to connect to server";
             } catch (Exception e) {
                 e.printStackTrace();
                 publishProgress(getString(R.string.error_login_form));
+                return "Login failed";
             }
-            return "Logged in successfully.";
+
         }
 
         @Override
