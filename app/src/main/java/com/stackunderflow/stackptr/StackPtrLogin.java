@@ -89,6 +89,15 @@ public class StackPtrLogin extends Activity {
 
         checkAPILogin();
 
+        apikeyField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    System.out.println("onfocuschange()");
+                    saveAPIKey();
+                    checkAPILogin();
+                }
+            }
+        });
     }
 
     public void doLogin(View view )  {
@@ -121,15 +130,6 @@ public class StackPtrLogin extends Activity {
     }
 
     public void changeServer(View view) {
-
-       /* <EditTextPreference android:title=""
-        android:key="server_address"
-        android:text="@string/text_server_address"
-        android:defaultValue="https://stackptr.com"
-                />*/
-
-
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.title_server_address));
 
@@ -171,17 +171,20 @@ public class StackPtrLogin extends Activity {
             String heading = headingPrefix + " " + stackPtrServer.getHost();
             lblLoginHeader.setText(heading);
         } catch (URISyntaxException e) {
-            System.out.println("failed");
+            lblLoginHeader.setText(headingPrefix + " <invalid server>");
         }
+    }
+
+    public void saveAPIKey() {
+        String apikey = apikeyField.getText().toString();
+        editor.putString("apikey", apikey);
+        editor.apply();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-		String apikey = apikeyField.getText().toString();
-
-		editor.putString("apikey", apikey);
-		editor.apply();
+        saveAPIKey();
     }
 
     private class ApiCheckLogin extends AsyncTask<Void, String, JSONObject> {
