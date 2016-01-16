@@ -106,6 +106,9 @@ public class StackPtr extends Activity {
                 wv.loadUrl("javascript:StackPtrConnect()");
             } else {
                 System.out.println("onResume: api key changed, reloading");
+                if (StackPtrUtils.apiKeyValid(startup_apikey) != null) {
+                    launchLogin();
+                }
                 reloadPage();
             }
         } else {
