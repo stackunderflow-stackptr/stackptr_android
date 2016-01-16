@@ -79,15 +79,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".StackPtrWebView"
-            android:label="@string/title_activity_stack_ptr_web_view" >
-            <intent-filter>
-                <action android:name="com.stackunderflow.stackptr.StackPtrWebView" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".StackPtrUserList"
             android:label="@string/title_activity_stack_ptr_user_list" >
         </activity>
