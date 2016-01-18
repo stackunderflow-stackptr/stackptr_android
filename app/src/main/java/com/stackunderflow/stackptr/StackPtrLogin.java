@@ -119,9 +119,9 @@ public class StackPtrLogin extends Activity {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
         if (scanResult != null) {
-            editor.putString("apikey", scanResult.getContents());
-            editor.apply();
-            apikeyField.setText(settings.getString("apikey", ""));
+            String apikey = scanResult.getContents();
+            apikeyField.setText(apikey);
+            saveAPIKey();
         }
     }
 
