@@ -58,7 +58,6 @@ public class StackPtr extends Activity {
 
         if (apikey_reason != null) {
             saveStartupAPIKeys();
-            launchLogin();
         } else {
             reloadPage();
         }
@@ -100,16 +99,18 @@ public class StackPtr extends Activity {
         if (startup_apikey != null && startup_server != null) {
             if (startup_apikey.equals(apikey) && startup_server.equals(server)) {
                 System.out.println("onResume: reconnecting");
-                if (StackPtrUtils.apiKeyValid(startup_apikey) != null) {
+                if (StackPtrUtils.apiKeyValid(apikey) != null) {
                     launchLogin();
                 }
                 wv.loadUrl("javascript:StackPtrConnect()");
             } else {
                 System.out.println("onResume: api key changed, reloading");
-                if (StackPtrUtils.apiKeyValid(startup_apikey) != null) {
+                if (StackPtrUtils.apiKeyValid(apikey) != null) {
                     launchLogin();
+                } else {
+                    saveStartupAPIKeys();
+                    reloadPage();
                 }
-                reloadPage();
             }
         } else {
             System.out.println("onResume: startup_apikey not defined");

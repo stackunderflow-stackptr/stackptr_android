@@ -122,6 +122,7 @@ public class StackPtrLogin extends Activity {
             String apikey = scanResult.getContents();
             apikeyField.setText(apikey);
             saveAPIKey();
+            checkAPILogin();
         }
     }
 
