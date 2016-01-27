@@ -175,7 +175,7 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 
 	});
 
-	$scope.myid = null;
+	$scope.me = null;
 	$scope.markers = {};
 	$scope.userList = {};
 	$scope.userPending = {};
@@ -227,7 +227,7 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 		} else if (item.type == 'grouplist') {
 			item.data.forEach(function(v) {
 				v.members.forEach(function(vm) {
-					if (vm.id == $scope.myid) {
+					if (vm.id == $scope.me.id) {
 						this.role = vm.role;
 					}
 				}, v);
@@ -657,19 +657,37 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 
 	///////////
 
-	$scope.doConnect = function() {
-		console.log("Connecting");
-		var resp = $http.post(stackptr_server_base_addr + '/ws_uid',
-			(stackptr_apikey != undefined) ? "apikey=" + encodeURIComponent(stackptr_apikey) : "");
-		resp.success(function(rdata, status, headers, config) {
-			console.log(rdata);
-			$scope.myid = rdata;
-			$wamp.connection._options.authid = rdata;
-			$wamp.open();
-		});
+
+	$scope.doInitialConnect = function() {
+		$http.post(stackptr_server_base_addr + '/uid', (stackptr_apikey != undefined) ? "apikey=" + encodeURIComponent(stackptr_apikey) : "").then(
+			function success(response) {
+				var rdata = response.data;
+				if (typeof rdata != "object") {
+					if (!(typeof stackptr_connection_failed === 'undefined')) {
+							stackptr_connection_failed("uid not object", "");
+					}
+				} else {
+					console.log(rdata);
+					$scope.me = rdata;
+					$wamp.connection._options.authid = rdata.id.toString();
+					$scope.doConnect = function() {
+						console.log("Connecting");
+						$wamp.open();
+					}
+					$scope.doInitialConnect = function() {};
+					$scope.doConnect();
+				}
+			},
+			function failure(response) {
+				if (!(typeof stackptr_connection_failed === 'undefined')) {
+						stackptr_connection_failed("uid failed to fetch", "");
+				}
+			}
+		)
 	}
 
-	$scope.doConnect();
+	$scope.doConnect = $scope.doInitialConnect;
+	$scope.doInitialConnect();
 
 	$scope.doDisconnect = function() {
 		console.log("Disconnecting");
@@ -694,12 +712,16 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 	});
 
 	$scope.getWSToken = function(data) {
-		var resp = $http.post(stackptr_server_base_addr + '/ws_token',
-			(stackptr_apikey != undefined) ? "apikey=" + encodeURIComponent(stackptr_apikey) : "");
-		resp.success(function(rdata, status, headers, config) {
-			console.log(rdata);
-			data.promise.resolve(rdata);
-		});
+		$http.post(stackptr_server_base_addr + '/ws_token', (stackptr_apikey != undefined) ? "apikey=" + encodeURIComponent(stackptr_apikey) : "").then(
+			function success(response) {
+				data.promise.resolve(response.data);
+			},
+			function failure(response) {
+				if (!(typeof stackptr_connection_failed === 'undefined')) {
+					stackptr_connection_failed("ws_token fetch failed", "");
+				}
+			}
+		);
 	}
 
 	$scope.$on("$wamp.open", function(event, session) {
@@ -736,8 +758,8 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 		$scope.reason = data.reason;
 		$scope.details = data.details;
 		if (!(typeof stackptr_connection_failed === 'undefined')) {
-        	stackptr_connection_failed(data.reason, data.details);
-        }
+		stackptr_connection_failed(data.reason, data.details);
+	}
 	});
 
 	$scope.processWS = function(type, data) {
@@ -779,10 +801,10 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 	}
 
 	$scope.share_user = function(obj) {
-		if (!(typeof stackptr_share_user === 'undefined')) {
-           	stackptr_share_user(obj);
-        }
-    }
+	if (!(typeof stackptr_share_user === 'undefined')) {
+			stackptr_share_user(obj);
+	  }
+  }
 
 }]);
 
