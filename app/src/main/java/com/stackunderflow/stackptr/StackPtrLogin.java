@@ -220,7 +220,7 @@ public class StackPtrLogin extends Activity {
                 int rc = uc3.getResponseCode();
                 System.out.println("rc = " + rc);
 
-                if (rc == 302) {
+                if (rc == 302 || rc == 401) {
                     publishProgress("Failed to log into the server with provided API key");
                     return null;
                 } else if (rc != 200) {
