@@ -174,13 +174,23 @@ public class StackPtr extends Activity {
 
         @JavascriptInterface
         public void serviceStop() {
-                stopService(new Intent(parent, StackPtrService.class));
+            SharedPreferences.Editor settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+            settings.putBoolean("startup_autostart", false);
+            settings.apply();
+
+            stopService(new Intent(parent, StackPtrService.class));
         }
 
         @JavascriptInterface
         public void serviceStart() {
             System.out.println("starting service");
+
+            SharedPreferences.Editor settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+            settings.putBoolean("startup_autostart", true);
+            settings.apply();
+
             startService(new Intent(parent, StackPtrService.class));
+
         }
 
         @JavascriptInterface

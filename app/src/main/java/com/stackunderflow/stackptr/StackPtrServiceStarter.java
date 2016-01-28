@@ -16,7 +16,7 @@ public class StackPtrServiceStarter extends BroadcastReceiver {
         if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-            boolean start_on_boot = settings.getBoolean("startup_autostart", true);
+            boolean start_on_boot = settings.getBoolean("startup_autostart", false);
 
             if (start_on_boot) {
                 Intent SPServiceIntent = new Intent(context, StackPtrService.class);
