@@ -7,7 +7,6 @@ import java.net.CookieHandler;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.NumberFormat;
 import java.util.HashMap;
 
 import android.app.Notification;
@@ -19,7 +18,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -29,11 +27,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Time;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.os.BatteryManager;
 
@@ -88,6 +81,13 @@ public class StackPtrService extends Service {
             apikey = settings.getString("apikey", "");
 
             // check API key "looks" valid here i.e. right length and is at least set
+
+            String apikey_reason = StackPtrUtils.apiKeyValid(apikey);
+
+            if (apikey_reason != null) {
+                Toast.makeText(this, apikey_reason, Toast.LENGTH_LONG).show();
+                updateMessage("Service not started: " + apikey_reason);
+            }
 
             int bg_update_time;
             try {
@@ -150,6 +150,21 @@ public class StackPtrService extends Service {
         overlay.closeOverlay();
 
 	}
+
+    public void updateMessage(String message) {
+        mBuilder.setContentText(message);
+
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+        inboxStyle.setBigContentTitle("StackPtr");
+        inboxStyle.addLine(message);
+
+        Context ctx = getApplicationContext();
+        PendingIntent overlayPendingIntent = PendingIntent.getBroadcast(ctx, 2, new Intent("com.stackunderflow.stackptr.overlay"), PendingIntent.FLAG_CANCEL_CURRENT);
+
+        mBuilder.setStyle(inboxStyle);
+        mBuilder.setContentIntent(overlayPendingIntent);
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+    }
 
 	private class UpdateLocationTask extends AsyncTask<Location, String, Location> {
 
@@ -280,38 +295,49 @@ public class StackPtrService extends Service {
 
 	private class StackLocationListener implements LocationListener {
 
+        Location prevLoc = null;
+
+        private boolean isGPSLoc(Location loc) {
+            return !loc.getProvider().equals("gps");
+        }
+
+        private void rejectLocation(Location loc, String reason) {
+            Time current = new Time(Time.getCurrentTimezone());
+            current.set(loc.getTime());
+            String notification_text = String.format("%s @ %s %s",loc.getProvider(), current.format("%k:%M:%S"), reason);
+            updateMessage(notification_text);
+        }
+
 		@Override
 		public void onLocationChanged(Location loc) {
-			//if (loggedIn) {
+
+            if (prevLoc != null) {
+                long timeBetween = loc.getTime() - prevLoc.getTime();
+
+                if (!isGPSLoc(loc) && isGPSLoc(prevLoc) && (timeBetween < 10)) {
+                    // reject network positions if we have a GPS fix <10s ago
+                    rejectLocation(loc, String.format("already have GPS fix %d ago", timeBetween));
+                    return;
+                }
+
+                float distanceBetween = prevLoc.distanceTo(loc);
+                float speed = (distanceBetween / (float)timeBetween) * 3.6f; // km/h
+
+                if (!isGPSLoc(loc) && (speed > 200.0f)) {
+                    // reject non-GPS fixes more than 200km/h away from current location
+                    rejectLocation(loc, String.format("average speed %.0fkm/h", speed));
+                    return;
+                }
+            }
 
             if (loc.getAccuracy() > 150.0) {
-                Time current = new Time(Time.getCurrentTimezone());
-                current.set(loc.getTime());
-                String notification_text = loc.getProvider() + " @ " + current.format("%k:%M:%S") + " too inaccurate (" + loc.getAccuracy() + "m)";
-                updateMessage(notification_text);
+                rejectLocation(loc, String.format("too inaccurate (%.0fm)", + loc.getAccuracy()));
                 return;
             }
 
+            prevLoc = loc;
 			new UpdateLocationTask().execute(loc);
-			//} else {
-			//	Toast.makeText(getBaseContext(), "Tried to update location but you are not logged in.", Toast.LENGTH_SHORT).show();
-			//}
 		}
-
-        public void updateMessage(String message) {
-            mBuilder.setContentText(message);
-
-            NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-            inboxStyle.setBigContentTitle("StackPtr");
-            inboxStyle.addLine(message);
-
-            Context ctx = getApplicationContext();
-            PendingIntent overlayPendingIntent = PendingIntent.getBroadcast(ctx, 2, new Intent("com.stackunderflow.stackptr.overlay"), PendingIntent.FLAG_CANCEL_CURRENT);
-
-            mBuilder.setStyle(inboxStyle);
-            mBuilder.setContentIntent(overlayPendingIntent);
-            mNotifyMgr.notify(mNotificationId, mBuilder.build());
-        }
 
 		@Override
 		public void onProviderDisabled(String arg0) {
