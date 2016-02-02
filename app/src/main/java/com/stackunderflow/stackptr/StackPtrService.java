@@ -314,7 +314,7 @@ public class StackPtrService extends Service {
             if (prevLoc != null) {
                 long timeBetween = loc.getTime() - prevLoc.getTime();
 
-                if (!isGPSLoc(loc) && isGPSLoc(prevLoc) && (timeBetween < 10)) {
+                if (!isGPSLoc(loc) && isGPSLoc(prevLoc) && (timeBetween < 30)) {
                     // reject network positions if we have a GPS fix <10s ago
                     rejectLocation(loc, String.format("already have GPS fix %d ago", timeBetween));
                     return;
