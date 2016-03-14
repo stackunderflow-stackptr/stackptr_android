@@ -17,6 +17,7 @@ import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 
 public class StackPtr extends Activity {
@@ -190,6 +191,7 @@ public class StackPtr extends Activity {
             settings.apply();
 
             startService(new Intent(parent, StackPtrService.class));
+            Toast.makeText(parent, getString(R.string.service_started), Toast.LENGTH_LONG).show();
 
         }
 
