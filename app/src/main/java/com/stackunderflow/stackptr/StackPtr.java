@@ -71,7 +71,7 @@ public class StackPtr extends Activity {
 
     private void reloadPage() {
         saveStartupAPIKeys();
-        wv.loadUrl("file:///android_asset/ui.html");
+        wv.loadUrl("file:///android_asset/map.html");
     }
 
     private void launchLogin() {
