@@ -74,7 +74,6 @@ public class StackPtrService extends Service {
 	public synchronized void onStart(Intent intent, int startId) {
         if (!hasStarted) {
             hasStarted = true;
-            Toast.makeText(this, getString(R.string.service_started), Toast.LENGTH_LONG).show();
             //System.out.printf("service started\n");
 
             settings = PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -146,7 +145,6 @@ public class StackPtrService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-        Toast.makeText(this, getString(R.string.service_destroyed), Toast.LENGTH_LONG).show();
         overlay.closeOverlay();
 
 	}

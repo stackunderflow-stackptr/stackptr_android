@@ -31,7 +31,6 @@
     <string name="compass_long_NW">North West</string>
     <string name="no_update">no update</string>
     <string name="service_started">Service started</string>
-    <string name="service_destroyed">StackPtr service destroyed</string>
     <string name="networkprovider_fail">NetworkProvider start failed</string>
     <string name="invalid_update_interval">Invalid value for update_interval</string>
     <string name="login_success">Logged in successfully, fetching API key</string>
