@@ -90,11 +90,11 @@
 				<ul class="dropdown-menu" role="menu">
 					<li><a ng-if="::!isStackPtrAndroid" href="/api/">Manage API keys</a></li>
 					<li><a ng-if="::!isStackPtrAndroid" href="https://stackptr.readthedocs.org/">API Docs</a></li>
-					<li class="divider"></li>
+					<li class="divider" ng-if="::!isStackPtrAndroid" />
 					<li ng-repeat="(tilename,tile) in ::tileservers"><a ng-click="setTileServer([[tilename]])" ng-bind="::tile.name"></a></li>
-					<li class="divider"></li>
+					<li class="divider" />
 					<li><a ng-bind="status"></a></li>
-					<li class="divider"></li>
+					<li class="divider" />
 					<li><a ng-if="::!isStackPtrAndroid" href="/logout">Log out</a></li>
 					<li><a ng-if="::isStackPtrAndroid" onclick="StackPtrAndroidShim.showSettings()">Prefs</a></li>
 					<li ng-if="::isStackPtrAndroid" class="divider"></li>
