@@ -129,12 +129,21 @@ public class StackPtr extends Activity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        wv.loadUrl("javascript:StackPtrBackPressed()");
+    }
+
+    public void doBackPressed() {
+        finish();
+    }
+
 
     public class StackPtrAndroidShim {
-        Activity parent;
+        StackPtr parent;
 
         /** Instantiate the interface and set the context */
-        StackPtrAndroidShim(Activity p) {
+        StackPtrAndroidShim(StackPtr p) {
             parent = p;
             System.out.println("init shim");
         }
@@ -209,6 +218,11 @@ public class StackPtr extends Activity {
                 // Mainly a concern for the emulator and non-GApps devices
                 StackPtrUtils.showAlertDialog(getApplicationContext(), getString(R.string.no_map_title), getString(R.string.no_map_message));
             }
+        }
+
+        @JavascriptInterface
+        public void doBackPressed() {
+            parent.doBackPressed();
         }
     }
 

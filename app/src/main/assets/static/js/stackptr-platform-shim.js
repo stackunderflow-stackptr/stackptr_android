@@ -21,3 +21,7 @@ stackptr_share_user = function(obj) {
 
     StackPtrAndroidShim.shareLocation(lat,lon,name);
 }
+
+function StackPtrBackPressed() {
+    StackPtrAndroidShim.doBackPressed();
+}
