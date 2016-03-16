@@ -23,5 +23,7 @@ stackptr_share_user = function(obj) {
 }
 
 function StackPtrBackPressed() {
-    StackPtrAndroidShim.doBackPressed();
+    if (!StackPtrCloseModal()) {
+        StackPtrAndroidShim.doBackPressed();
+    }
 }
