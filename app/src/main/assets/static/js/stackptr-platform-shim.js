@@ -9,7 +9,7 @@ stackptr_apikey = StackPtrAndroidShim.get_apikey();
 
 stackptr_connection_failed = function(reason, details) {
     console.log("connection failed - reason: " + reason + " details: " + details);
-    if (reason != "lost" && reason != "closed") {
+    if (reason != "lost") {
         StackPtrAndroidShim.showLogin();
     }
 }
