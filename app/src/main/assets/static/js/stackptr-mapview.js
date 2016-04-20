@@ -14,15 +14,14 @@ if (typeof stackptr_apikey == 'undefined') {
 
 stackptr_server_base_addr = stackptr_server_base_protocol + "//" + stackptr_server_base_host;
 
-var app = angular.module("StackPtr", ['ui-leaflet', 'angularMoment', 'ngAnimate', 'ngSanitize', 'mgcrea.ngStrap', 'vxWamp', 'ngCookies', 'xeditable']).config(function($interpolateProvider) {
-	$interpolateProvider.startSymbol('[[').endSymbol(']]');
-});
+var app = angular.module("StackPtr", ['ui-leaflet', 'angularMoment', 'ngAnimate', 'ngSanitize', 'mgcrea.ngStrap', 'vxWamp', 'ngCookies', 'xeditable']);
 
-app.config(function($wampProvider, $modalProvider) {
+app.config(['$wampProvider', '$modalProvider', '$compileProvider', function($wampProvider, $modalProvider, $compileProvider) {
 	var wsurl = (stackptr_server_base_protocol == 'https:' ? 'wss://' : 'ws://') + stackptr_server_base_host + '/ws';
 	$wampProvider.init({
 		url: wsurl,
 		realm: 'stackptr',
+		authid: '-1',
 		authmethods: ["ticket"],
 		max_retries: -1,
 		max_retry_delay: 60,
@@ -30,14 +29,18 @@ app.config(function($wampProvider, $modalProvider) {
 	angular.extend($modalProvider.defaults, {
 		html: true
 	});
-});
+	$compileProvider.debugInfoEnabled(false);
+}]);
 
-app.run(function($http,editableOptions) {
+app.run(['$http', 'editableOptions', function($http,editableOptions) {
 	$http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
 	editableOptions.theme = 'bs3';
-});
+}]);
+
+var stackptr_scope;
 
 app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leafletData', 'leafletDrawEvents', 'leafletMapEvents', '$wamp', '$compile', function($scope, $cookies, $http, $interval, leafletData, leafletDrawEvents, leafletMapEvents, $wamp, $compile) {
+	stackptr_scope = $scope;
 
 	stackptr_leafletdata_map = leafletData.getMap;
 
@@ -86,12 +89,11 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 		return cookie_ts
 	}
 
-	$scope.setTileServer = function(ev) {
-		var new_ts_name = ev[0][0];
+	$scope.setTileServer = function(new_ts_name) {
 		$cookies.put('tileserver', new_ts_name);
 		angular.extend($scope, {
 			tiles: $scope.getTileServer()
-		})
+		});
 	}
 
 	$scope.$on('leafletDirectiveMap.moveend', function(event) {
@@ -159,7 +161,6 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 
 	});
 
-	$scope.me = null;
 	$scope.markers = {};
 	$scope.userList = {};
 	$scope.userPending = {};
@@ -212,7 +213,7 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 		} else if (item.type == 'grouplist') {
 			item.data.forEach(function(v) {
 				v.members.forEach(function(vm) {
-					if (vm.id == $scope.me.id) {
+					if (vm.id == $scope.userMe.id) {
 						this.role = vm.role;
 					}
 				}, v);
@@ -706,38 +707,12 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 		}
 	};
 
-	$scope.doInitialConnect = function() {
-		$scope.getCSRFTokenThen(function() {
-			$http.post(stackptr_server_base_addr + '/uid', (stackptr_apikey != undefined) ? "apikey=" + encodeURIComponent(stackptr_apikey) : "").then(
-				function success(response) {
-					var rdata = response.data;
-					if (typeof rdata != "object") {
-						if (!(typeof stackptr_connection_failed === 'undefined')) {
-								stackptr_connection_failed("uid not object", "");
-						}
-					} else {
-						console.log(rdata);
-						$scope.me = rdata;
-						$wamp.connection._options.authid = rdata.id.toString();
-						$scope.doConnect = function() {
-							console.log("Connecting");
-							$wamp.open();
-						}
-						$scope.doInitialConnect = function() {};
-						$scope.doConnect();
-					}
-				},
-				function failure(response) {
-					if (!(typeof stackptr_connection_failed === 'undefined')) {
-							stackptr_connection_failed("uid failed to fetch", "");
-					}
-				}
-			)
-		})
-	};
+	$scope.doConnect = function() {
+		console.log("Connecting");
+		$wamp.open();
+	}
 
-	$scope.doConnect = $scope.doInitialConnect;
-	$scope.doInitialConnect();
+	$scope.doConnect();
 
 	$scope.doDisconnect = function() {
 		console.log("Disconnecting");
@@ -747,16 +722,20 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 	$scope.$on("$wamp.onchallenge", function(event, data) {
 		console.log(data);
 		if (data.method === "ticket") {
-			$scope.getCSRFTokenThen(function() {
-				$scope.getWSToken(data);
-			});
+			if (stackptr_apikey != undefined) {
+				data.promise.resolve(stackptr_apikey);
+			} else {
+				$scope.getCSRFTokenThen(function() {
+					$scope.getWSToken(data);
+				});
+			}
 		} else {
 			alert("Could not auth to server - ticket auth not offered!");
 		}
 	});
 
 	$scope.getWSToken = function(data) {
-		$http.post(stackptr_server_base_addr + '/ws_token', (stackptr_apikey != undefined) ? "apikey=" + encodeURIComponent(stackptr_apikey) : "").then(
+		$http.post(stackptr_server_base_addr + '/ws_token').then(
 			function success(response) {
 				data.promise.resolve(response.data);
 			},
@@ -963,28 +942,21 @@ $(document).ready(function() {
 });
 
 function StackPtrConnect() {
-	angular.element($('body')).scope().doConnect();
+	stackptr_scope.doConnect();
 }
 
 function StackPtrDisconnect() {
-	angular.element($('body')).scope().doDisconnect();
+	stackptr_scope.doDisconnect();
 }
 
 function StackPtrCloseModal() {
-	return angular.element($('body')).scope().doCloseModal();
+	return stackptr_scope.doCloseModal();
 }
 
 function setRoleUserClick(uid, role) {
-	var $scope = angular.element($('body')).scope();
-	$scope.setRoleUser(uid, role);
+	stackptr_scope.setRoleUser(uid, role);
 }
 
 function delUserClick(item, uid) {
-	var $scope = angular.element($('body')).scope();
-	$scope.delUser(uid);
-}
-
-function acceptUserClick(item, uid) {
-	var $scope = angular.element($('body')).scope();
-	$scope.acceptUser(uid);
+	stackptr_scope.delUser(uid);
 }
