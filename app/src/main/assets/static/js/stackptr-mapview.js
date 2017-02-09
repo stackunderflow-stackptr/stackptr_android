@@ -56,28 +56,11 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 	$scope.tileservers = {
 		stackptr: {
 			name: 'StackPtr Default Style',
-			url: 'https://tile{s}.stackcdn.com/' + (L.Browser.retina ? 'osm_tiles_2x' : 'osm_tiles') + '/{z}/{x}/{y}.png',
+			url: 'https://tile{s}.stackcdn.com/osm_tiles_2x/{z}/{x}/{y}.png',
 			options: {
 				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 				maxZoom: 18,
 				subdomains: '123456',
-			}
-		},
-		stackptr_no_retina: {
-			name: 'StackPtr Default No Retina',
-			url: 'https://tile{s}.stackcdn.com/osm_tiles/{z}/{x}/{y}.png',
-			options: {
-				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-				maxZoom: 18,
-				subdomains: '123456',
-			}
-		},
-		mqosm: {
-			name: 'MapQuest OSM',
-			url: 'https://otile{s}-s.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.png',
-			options: {
-				attribution: 'Tiles courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a>, &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-				subdomains: '1234',
 			}
 		}
 	}
