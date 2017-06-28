@@ -19,6 +19,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import com.stackunderflow.stackptrservice.StackPtrService;
+
 
 public class StackPtr extends Activity {
     SharedPreferences settings;
@@ -175,7 +177,7 @@ public class StackPtr extends Activity {
             ActivityManager m = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
             for (ActivityManager.RunningServiceInfo service : m.getRunningServices(Integer.MAX_VALUE)) {
                 String serviceName = service.service.getClassName();
-                if (serviceName.equals("com.stackunderflow.stackptr.StackPtrService")) {
+                if (serviceName.equals("com.stackunderflow.stackptrservice.StackPtrService")) {
                     return "true";
                 }
             }

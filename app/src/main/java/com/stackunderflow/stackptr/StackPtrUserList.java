@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,6 +23,7 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.stackunderflow.stackptrapi.StackPtrApiGetUsers;
 import com.stackunderflow.stackptrapi.StackPtrApiGetUsersParams;
+import com.stackunderflow.stackptroverlay.StackPtrCompassViewGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;

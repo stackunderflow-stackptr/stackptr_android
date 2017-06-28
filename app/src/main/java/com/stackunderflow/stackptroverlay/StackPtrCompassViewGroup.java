@@ -36,6 +36,12 @@ public class StackPtrCompassViewGroup extends ViewGroup {
 
             Context context = this.getContext();
 
+            ImageView bgTile = new ImageView(context);
+            Picasso.with(context).load("https://tile1.stackcdn.com/osm_tiles_2x/16/59159/40213.png").into(bgTile);
+            addView(bgTile);
+            bgTile.layout(0,0,512,512);
+
+
             double half_width = width / 2.0;
             ArrayList<Integer> presentIds = new ArrayList<Integer>();
 

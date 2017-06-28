@@ -42,7 +42,7 @@
         </activity>
 
         <service
-            android:name=".StackPtrService"
+            android:name="com.stackunderflow.stackptrservice.StackPtrService"
             android:icon="@drawable/ic_launcher" >
             <intent-filter>
                 <action android:name="com.stackunderflow.stackptr.StackPtrService" />
@@ -51,7 +51,7 @@
         </service>
 
         <receiver
-            android:name=".StackPtrServiceStarter"
+            android:name="com.stackunderflow.stackptrservice.StackPtrServiceStarter"
             android:enabled="true"
             android:exported="true"
             android:label="StartAtBoot" >
