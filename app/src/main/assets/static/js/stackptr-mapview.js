@@ -320,14 +320,10 @@ app.controller("StackPtrMap", ['$scope', '$cookies', '$http', '$interval', 'leaf
 				latlngs: []
 			};
 
-			var img = new Image();
-			img.onload = function() {
-				var colourThief = new ColorThief();
-				var colour = colourThief.getColor(img);
-				$scope.paths[markerId].color = rgb2hash(colour[0], colour[1], colour[2]);
-			};
-			img.crossOrigin = 'Anonymous';
-			img.src = userObj.icon;
+			updateTrackColour(userObj.icon, function(colour){
+				$scope.paths[markerId].color = colour;
+			});
+
 			if (userObj.gid == undefined) {
 				$wamp.call('com.stackptr.api.lochist', [], {
 					target: userObj.id
