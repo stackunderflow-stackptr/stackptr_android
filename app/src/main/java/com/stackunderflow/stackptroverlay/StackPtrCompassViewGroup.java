@@ -1,4 +1,4 @@
-package com.stackunderflow.stackptr;
+package com.stackunderflow.stackptroverlay;
 
 import android.content.Context;
 import android.graphics.Canvas;

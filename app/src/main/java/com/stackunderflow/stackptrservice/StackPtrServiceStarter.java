@@ -1,10 +1,12 @@
-package com.stackunderflow.stackptr;
+package com.stackunderflow.stackptrservice;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import com.stackunderflow.stackptrservice.StackPtrService;
 
 
 public class StackPtrServiceStarter extends BroadcastReceiver {

@@ -1,4 +1,4 @@
-package com.stackunderflow.stackptr;
+package com.stackunderflow.stackptrservice;
 
 import java.io.BufferedWriter;
 import java.io.OutputStream;
@@ -32,6 +32,10 @@ import android.os.BatteryManager;
 
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.OkUrlFactory;
+import com.stackunderflow.stackptr.BuildConfig;
+import com.stackunderflow.stackptr.R;
+import com.stackunderflow.stackptr.StackPtrUtils;
+import com.stackunderflow.stackptroverlay.StackPtrOverlay;
 
 import org.json.JSONObject;
 

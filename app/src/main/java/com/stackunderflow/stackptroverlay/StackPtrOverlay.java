@@ -1,4 +1,4 @@
-package com.stackunderflow.stackptr;
+package com.stackunderflow.stackptroverlay;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,13 +12,9 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.stackunderflow.stackptrapi.StackPtrApiGetUsers;
 import com.stackunderflow.stackptrapi.StackPtrApiGetUsersParams;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class StackPtrOverlay {
     private WindowManager wm;
