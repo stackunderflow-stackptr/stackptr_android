@@ -71,7 +71,7 @@ public class StackPtrService extends Service {
 	}
 
 	@Override
-	public synchronized void onStart(Intent intent, int startId) {
+	public synchronized int onStartCommand(Intent intent, int flags, int startId) {
         if (!hasStarted) {
             hasStarted = true;
             //System.out.printf("service started\n");
@@ -140,7 +140,8 @@ public class StackPtrService extends Service {
             registerReceiver(receiver, filter);
 
         }
-	}
+        return START_STICKY;
+    }
 
 	@Override
 	public void onDestroy() {
