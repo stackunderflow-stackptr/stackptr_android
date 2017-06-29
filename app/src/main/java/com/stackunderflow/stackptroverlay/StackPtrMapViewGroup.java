@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
+import com.stackunderflow.stackptrmap.StackPtrMapTileCalc;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,11 +25,19 @@ public class StackPtrCompassViewGroup extends ViewGroup {
     int width, height, centre_x, centre_y;
 
     SparseArray<ImageView> views;
+    SparseArray<JSONObject> users;
+    ImageView bgTile;
+    int fuser = 3;
+    int zoom = 16;
 
     public StackPtrCompassViewGroup(Context context) {
         super(context);
-        views = new SparseArray<ImageView>();
-        init(null, 0);
+        views = new SparseArray<>();
+        users = new SparseArray<>();
+        bgTile = new ImageView(context);
+        addView(bgTile);
+        bgTile.layout(0,0,512,512);
+
     }
 
     public void updateDataAndRepaint(JSONArray jUsers, Location lastloc) {
@@ -36,19 +45,26 @@ public class StackPtrCompassViewGroup extends ViewGroup {
 
             Context context = this.getContext();
 
-            ImageView bgTile = new ImageView(context);
-            Picasso.with(context).load("https://tile1.stackcdn.com/osm_tiles_2x/16/59159/40213.png").into(bgTile);
-            addView(bgTile);
-            bgTile.layout(0,0,512,512);
-
-
-            double half_width = width / 2.0;
-            ArrayList<Integer> presentIds = new ArrayList<Integer>();
-
             for (int i = 0; i < jUsers.length(); i++) {
                 JSONObject thisUser = jUsers.getJSONObject(i);
                 Integer user = thisUser.getInt("id");
-                presentIds.add(user);
+                users.append(user, thisUser);
+            }
+
+            JSONObject tracked_user = users.get(fuser);
+            JSONArray tu_loc = tracked_user.getJSONArray("loc");
+            final double tracked_user_lat = tu_loc.getDouble(0);
+            final double tracked_user_lon = tu_loc.getDouble(1);
+            double tracked_user_xtile = StackPtrMapTileCalc.xtileForLon(tracked_user_lon,zoom);
+            double tracked_user_ytile = StackPtrMapTileCalc.ytileForLat(tracked_user_lat,zoom);
+            Picasso.with(context).load(
+                    StackPtrMapTileCalc.mapUrl(tracked_user_xtile,tracked_user_ytile,zoom)
+            ).into(bgTile);
+
+
+            for(int i = 0; i < users.size(); i++) {
+                int user = users.keyAt(i);
+                JSONObject thisUser = users.valueAt(i);
 
                 ImageView userView = views.get(user);
                 if (userView == null) {
@@ -63,41 +79,39 @@ public class StackPtrCompassViewGroup extends ViewGroup {
                 JSONArray jLoc = thisUser.getJSONArray("loc");
                 final double lat = jLoc.getDouble(0);
                 final double lon = jLoc.getDouble(1);
-                Location userLocation = new Location("StackPtr");
-                userLocation.setLatitude(lat);
-                userLocation.setLongitude(lon);
 
-                float dist = lastloc.distanceTo(userLocation);
+                double xtile = StackPtrMapTileCalc.xtileForLon(lon,zoom);
+                double ytile = StackPtrMapTileCalc.ytileForLat(lat,zoom);
+
+                double xcoord = StackPtrMapTileCalc.pxCoord(xtile,512);
+                double ycoord = StackPtrMapTileCalc.pxCoord(ytile,512);
+
+                if ((Math.floor(xtile) == Math.floor(tracked_user_xtile)) &&
+                (Math.floor(ytile) == Math.floor(tracked_user_ytile))) {
+                    userView.setVisibility(VISIBLE);
+                } else {
+                    userView.setVisibility(INVISIBLE);
+                }
+
+                iconMove(userView, (int) xcoord, (int) ycoord, 96);
+
+                /*Location userLocation = new Location("StackPtr");
+                userLocation.setLatitude(lat);
+                userLocation.setLongitude(lon);*/
+
+                /*float dist = lastloc.distanceTo(userLocation);
                 float bearing = lastloc.bearingTo(userLocation);
                 if (bearing < 0) {
                     bearing += 360;
-                }
+                }*/
 
-                double xvect = Math.sin( Math.toRadians(bearing) );
-                double yvect = -Math.cos( Math.toRadians(bearing) );
-
-                //dist = 100;
-                double r = Math.log10(dist) - 1.0;
-                r = Math.max(r, 0.0);
-                r *= half_width / 3.0;
-
-                double xcoord = xvect * r;
-                double ycoord = yvect * r;
-
-                xcoord = Math.max(-half_width + 16, xcoord);
-                xcoord = Math.min(half_width - 16, xcoord);
-
-                ycoord = Math.max(-half_width + 16, ycoord);
-                ycoord = Math.min(half_width - 16, ycoord);
-
-                iconMove(userView, (int) xcoord, (int) ycoord, 64);
             }
 
             // remove all the image views for users we didn't see again
             ArrayList<Integer> viewsToRemove = new ArrayList<Integer>();
             for (int i=0; i<views.size(); i++) {
                 Integer viewId = views.keyAt(i);
-                if (!presentIds.contains(viewId)) {
+                if (users.get(viewId) == null) {
                     viewsToRemove.add(viewId);
                 }
             }
@@ -107,16 +121,16 @@ public class StackPtrCompassViewGroup extends ViewGroup {
                 views.remove(rmView);
             }
 
+
+
         } catch (JSONException e) {
             System.out.print(e);
         }
     }
 
     private void iconMove(ImageView icon, int x, int y, int size) {
-        int centre_x = (getWidth() - getPaddingLeft() - getPaddingRight())/2;
-        int centre_y = (getHeight() - getPaddingTop() - getPaddingBottom())/2;
         int hsize = size / 2;
-        icon.layout(centre_x + x - hsize, centre_y + y - hsize, centre_x + x + hsize, centre_y + y + hsize);
+        icon.layout(x - hsize, y - hsize, x + hsize, y + hsize);
     }
 
 
@@ -135,28 +149,5 @@ public class StackPtrCompassViewGroup extends ViewGroup {
         //System.out.printf("left %d, top %d, right %d, bottom %d, width %d, height %d\n", left, top, right, bottom, contentWidth, contentHeight);
     }
 
-    Paint greenLine;
-
-    private void init(AttributeSet attrs, int defStyle) {
-        setWillNotDraw(false);
-        greenLine = new Paint();
-        greenLine.setColor(Color.GREEN);
-        greenLine.setStyle(Paint.Style.STROKE);
-        greenLine.setStrokeWidth(2.0f);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        for (int i=0; i<5; i++) {
-            canvas.drawCircle(centre_x, centre_y, (float) ((i * width / 6.0) - 1.0), greenLine);
-        }
-
-        canvas.drawLine(0.0f, centre_y, width, centre_y, greenLine);
-        canvas.drawLine(centre_x, 0, centre_x, height, greenLine);
-        canvas.drawLine(0, 0, width, height, greenLine);
-        canvas.drawLine(width, 0, 0, height, greenLine);
-    }
 
 }

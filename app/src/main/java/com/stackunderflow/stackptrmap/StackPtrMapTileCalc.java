@@ -20,4 +20,9 @@ public class StackPtrMapTileCalc {
         return String.format("https://tile1.stackcdn.com/osm_tiles_2x/%d/%d/%d.png", zoom, xtile_f, ytile_f);
     }
 
+    public static double pxCoord(double coord, int px) {
+        double coordFrac = coord - Math.floor(coord);
+        return coordFrac * px;
+    }
+
 }

@@ -21,7 +21,7 @@ public class StackPtrOverlay {
     private LocationManager lm;
     private StackPtrOverlayLocationListener ll;
     private WindowManager.LayoutParams wmp;
-    private StackPtrCompassViewGroup vg;
+    private StackPtrMapViewGroup vg;
     private StackPtrApiGetUsersParams spagup;
     private Boolean overlayShown;
     private Location lastloc;
@@ -36,7 +36,7 @@ public class StackPtrOverlay {
 
         overlayShown = false;
 
-        vg = new StackPtrCompassViewGroup(ctx);
+        vg = new StackPtrMapViewGroup(ctx);
 
         wmp = new WindowManager.LayoutParams(
                 512,

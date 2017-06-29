@@ -23,7 +23,7 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.stackunderflow.stackptrapi.StackPtrApiGetUsers;
 import com.stackunderflow.stackptrapi.StackPtrApiGetUsersParams;
-import com.stackunderflow.stackptroverlay.StackPtrCompassViewGroup;
+import com.stackunderflow.stackptroverlay.StackPtrMapViewGroup;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +39,7 @@ public class StackPtrUserList extends Activity {
     StackPtrApiGetUsersParams spagup;
     StackPtrListViewArrayAdaptor adapter;
     JSONArray jUsers;
-    StackPtrCompassViewGroup spcvg;
+    StackPtrMapViewGroup spcvg;
     Location lastloc;
 
 
@@ -59,7 +59,7 @@ public class StackPtrUserList extends Activity {
         adapter = new StackPtrListViewArrayAdaptor(this);
         listview.setAdapter(adapter);
 
-        spcvg = new StackPtrCompassViewGroup(ctx);
+        spcvg = new StackPtrMapViewGroup(ctx);
         spcvg.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 200));
 
         listview.addHeaderView(spcvg);
